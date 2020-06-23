@@ -38,6 +38,11 @@ private:
 	}
 
 	void func_body(InputFile& inf) {
-		
+		Stmt st;
+		while (!inf.eof()) {
+			if      (inf.peeklower() == "end") break;
+			else if (inf.eol()) inf.nextline();
+			else    st.build(inf);
+		}
 	}
 };
