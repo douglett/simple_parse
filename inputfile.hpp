@@ -50,11 +50,17 @@ struct InputFile {
 		if (eol()) return "<EOL>";
 		return getline().at(pos);
 	}
+	string peeklower() const {
+		auto s = peek();
+		if (eof() || eol()) return s;
+		for (auto& c : s) c = tolower(c);
+		return s;
+	}
 	int next() {
 		return ++pos, eol();
 	}
 	int nextline() {
-		return ++linepos, eof();
+		return ++linepos, pos=0, eof();
 	}
 
 	void showrawlines() const {

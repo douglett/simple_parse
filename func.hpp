@@ -1,27 +1,39 @@
 #include "inputfile.hpp"
+#include <string>
+using namespace std;
 
 struct Func {
 	//const string ERR = "syntax error";
+	string func_name;
 
 	int build(InputFile& inf) {
-		// function start
-		if (inf.peek() != "function") return 0;
+		func_start(inf);
+		func_body(inf);
+		func_end(inf);
+		return 0;
+	}
+
+private:
+	void func_start(InputFile& inf) {
+		if (inf.peeklower() != "function") inf.die();
 		inf.next();
 		if (!inf.is_identifier()) inf.die();
-		auto name = inf.peek();
-		printf("function name: %s\n", name.c_str());
+		func_name = inf.peek();
+		printf("function name: %s\n", func_name.c_str());
 		inf.next();
 		if (!inf.eol()) inf.die();
 		inf.nextline();
+	}
 
-		// function end
-		printf("%s\n", inf.peek().c_str());
-		if (inf.peek() != "end") inf.die("a");
+	void func_end(InputFile& inf) {
+		if (inf.peeklower() != "end") inf.die();
 		inf.next();
-		if (inf.peek() != "function") inf.die();
+		if (inf.peeklower() != "function") inf.die();
 		inf.next();
 		if (!inf.eol()) inf.die();
 		inf.nextline();
-		return 0;
+	}
+
+	void func_body(InputFile& inf) {
 	}
 };
