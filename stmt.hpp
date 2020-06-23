@@ -17,6 +17,7 @@ private:
 	void do_print(InputFile& inp) {
 		type = "print";
 		inp.next();
+		while (inp.is_strlit()) inp.next();
 		inp.nextline();
 	}
 };

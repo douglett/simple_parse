@@ -18,7 +18,9 @@ struct InputFile {
 		while(std::getline(fs, s)) {
 			rawlines.push_back(s);
 			parseline(s);
+			linepos++; // for errors
 		}
+		linepos = 0;
 		fs.close();
 
 		showrawlines();
@@ -44,6 +46,10 @@ struct InputFile {
 		for (auto c : t)
 			if (!isalnum(c)) return 0;
 		return 1;
+	}
+	int is_strlit() const {
+		auto t = peek();
+		return t.length() >= 2 && t[0] == '"' && t.back() == '"';
 	}
 
 	string peek() const {
@@ -95,14 +101,26 @@ private:
 	void parseline(const string& ln) {
 		vector<string> tokens;
 		string tok;
-		for (auto c : ln) {
+		for (int i = 0; i < (int)ln.length(); i++) {
+			auto c = ln[i];
 			if      (isspace(c)) addtok(tokens, tok);
 			else if (isalnum(c)) tok += c;
 			else if (c == '#') break; // omit line comments
+			else if (c == '"') addtok(tokens, tok), tok = getstrlit(ln, i), addtok(tokens, tok);
 			else    addtok(tokens, tok), tok = string(c, 1), addtok(tokens, tok);
 		}
 		addtok(tokens, tok);
 		lines.push_back(tokens);
+	}
+
+	string getstrlit(const string& ln, int& i) {
+		string tok = "\"";
+		while (++i) {
+			if (i >= (int)ln.length()) die("string termination error");
+			tok += ln[i];
+			if (ln[i] == '"') break;
+		}
+		return tok;
 	}
 
 	int addtok(vector<string>& tokens, string& tok) {

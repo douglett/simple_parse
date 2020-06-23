@@ -1,3 +1,3 @@
 function fart1  # my function
-	print
+	print "ass hole   blah"
 end function
