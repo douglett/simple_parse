@@ -1,10 +1,13 @@
+#pragma once
 #include "inputfile.hpp"
+#include "stmt.hpp"
 #include <string>
 using namespace std;
 
 struct Func {
 	//const string ERR = "syntax error";
 	string func_name;
+	vector<Stmt> statements;
 
 	int build(InputFile& inf) {
 		func_start(inf);
@@ -35,5 +38,6 @@ private:
 	}
 
 	void func_body(InputFile& inf) {
+		
 	}
 };
