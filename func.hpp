@@ -1,5 +1,5 @@
 #pragma once
-#include "inputfile.hpp"
+#include "globals.hpp"
 #include "stmt.hpp"
 #include <string>
 using namespace std;
@@ -9,40 +9,40 @@ struct Func {
 	string func_name;
 	vector<Stmt> statements;
 
-	int build(InputFile& inf) {
-		func_start(inf);
-		func_body(inf);
-		func_end(inf);
+	int build() {
+		func_start();
+		func_body();
+		func_end();
 		return 0;
 	}
 
 private:
-	void func_start(InputFile& inf) {
-		if (inf.peeklower() != "function") inf.die();
-		inf.next();
-		if (!inf.is_identifier()) inf.die();
-		func_name = inf.peek();
+	void func_start() {
+		if (input.peeklower() != "function") input.die();
+		input.next();
+		if (!input.is_identifier()) input.die();
+		func_name = input.peek();
 		printf("function name: %s\n", func_name.c_str());
-		inf.next();
-		if (!inf.eol()) inf.die();
-		inf.nextline();
+		input.next();
+		if (!input.eol()) input.die();
+		input.nextline();
 	}
 
-	void func_end(InputFile& inf) {
-		if (inf.peeklower() != "end") inf.die();
-		inf.next();
-		if (inf.peeklower() != "function") inf.die();
-		inf.next();
-		if (!inf.eol()) inf.die();
-		inf.nextline();
+	void func_end() {
+		if (input.peeklower() != "end") input.die();
+		input.next();
+		if (input.peeklower() != "function") input.die();
+		input.next();
+		if (!input.eol()) input.die();
+		input.nextline();
 	}
 
-	void func_body(InputFile& inf) {
+	void func_body() {
 		Stmt st;
-		while (!inf.eof()) {
-			if      (inf.peeklower() == "end") break;
-			else if (inf.eol()) inf.nextline();
-			else    st.build(inf);
+		while (!input.eof()) {
+			if      (input.peeklower() == "end") break;
+			else if (input.eol()) input.nextline();
+			else    st.build();
 		}
 	}
 };

@@ -8,24 +8,24 @@ struct Stmt {
 
 	vector<string> literals; // temp
 
-	int build(InputFile& inp) {
-		printf("%02d: stmt: %s\n", inp.linepos+1, inp.peek().c_str());
-		if (inp.peeklower() == "print") do_print(inp);
-		else inp.die();
+	int build() {
+		printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
+		if (input.peeklower() == "print") do_print();
+		else input.die();
 		return 0;
 	}
 
 private:
-	void do_print(InputFile& inp) {
+	void do_print() {
 		printf("parsing print...\n");
 		type = "print";
-		inp.next();
-		//while (inp.is_strlit()) inp.next();
+		input.next();
+		//while (input.is_strlit()) input.next();
 		while (true)
-			if (inp.is_strlit()) literals.push_back(inp.peek()), inp.next();
+			if (input.is_strlit()) literals.push_back(input.peek()), input.next();
 			else break;
-		if (!inp.eol()) inp.die();
-		inp.nextline();
+		if (!input.eol()) input.die();
+		input.nextline();
 
 		for (auto l : literals)
 			printf("  literal: %s\n", l.c_str());

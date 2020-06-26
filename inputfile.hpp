@@ -9,10 +9,16 @@ struct InputFile {
 	vector<vector<string>> lines;
 	uint32_t linepos = 0, pos = 0;
 
-	InputFile(const string& name) {
+	InputFile() { }
+	InputFile(const string& name) { load(name); }
+
+	// initialising InputFile with source file
+	int load(const string& name) {
+		reset();
 		std::fstream fs(name, ios::in);
 		if (!fs.is_open())
 			fprintf(stderr, "error opening file: %s\n", name.c_str()), exit(1);
+		// return 1;
 
 		string s;
 		while(std::getline(fs, s)) {
@@ -25,8 +31,15 @@ struct InputFile {
 
 		showrawlines();
 		showlines();
+		return 0;
+	}
+	void reset() {
+		lines = {};
+		rawlines = {};
+		linepos = pos = 0;
 	}
 
+	// parsing
 	int eof() const {
 		return linepos >= rawlines.size();
 	}
