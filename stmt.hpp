@@ -3,22 +3,17 @@
 #include <string>
 using namespace std;
 
-struct Stmt {
-	string type;
+// generic statement base class
+struct Stmt_type {
+	virtual int build() { return 0; }
+};
 
+// print statements
+struct Stmt_print : Stmt_type {
 	vector<string> literals; // temp
 
 	int build() {
-		printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
-		if (input.peeklower() == "print") do_print();
-		else input.die();
-		return 0;
-	}
-
-private:
-	void do_print() {
 		printf("parsing print...\n");
-		type = "print";
 		input.next();
 		//while (input.is_strlit()) input.next();
 		while (true)
@@ -29,5 +24,23 @@ private:
 
 		for (auto l : literals)
 			printf("  literal: %s\n", l.c_str());
+		return 0;
+	}
+};
+
+// statement parser god class
+struct Stmt : Stmt_type {
+private:
+	string type;
+	Stmt_print s_print;
+public:
+	int build() {
+		printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
+		if (input.peeklower() == "print") type = "print", s_print.build();
+		else input.die();
+		return 0;
+	}
+	Stmt_type* get() {
+		return &s_print;
 	}
 };
