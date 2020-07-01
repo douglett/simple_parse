@@ -1,3 +1,5 @@
 function fart1  # my function
-	print "ass hole   blah" "mewmew" 1
+	dim a
+	a = 1
+	print "ass hole   blah" "mewmew"
 end function

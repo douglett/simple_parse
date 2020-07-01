@@ -53,7 +53,16 @@ struct InputFile {
 		return rawlines.at(linepos);
 	}
 
+	int is_keyword() const {
+		static const vector<string> KEYWORDS = {
+			"function", "end", "dim", "print" };
+		auto t = peek();
+		for (auto& k : KEYWORDS)
+			if (t == k) return 1;
+		return 0;
+	};
 	int is_identifier() const {
+		if (is_keyword()) return 0;
 		auto t = peek();
 		if (t.length() == 0 || !isalpha(t[0])) return 0;
 		for (auto c : t)
@@ -63,6 +72,13 @@ struct InputFile {
 	int is_strlit() const {
 		auto t = peek();
 		return t.length() >= 2 && t[0] == '"' && t.back() == '"';
+	}
+	int is_integer() const {
+		auto t = peek();
+		if (t.length() == 0) return 0;
+		for (auto c : t)
+			if (c < '0' || c > '9') return 0;
+		return 1;
 	}
 
 	string peek() const {
@@ -84,6 +100,7 @@ struct InputFile {
 	}
 
 	void showrawlines() const {
+		printf("::source-raw-lines::\n");
 		int lno = 0;
 		for (auto ln : rawlines) {
 			lno++;
@@ -92,8 +109,9 @@ struct InputFile {
 	}
 
 	void showlines() const {
+		printf("::source-lines::\n");
 		int lno = 0;
-		for (auto ln : lines) {
+		for (auto& ln : lines) {
 			lno++;
 			printf("%02d: ", lno);
 			for (auto tok : ln)
@@ -120,7 +138,7 @@ private:
 			else if (isalnum(c)) tok += c;
 			else if (c == '#') break; // omit line comments
 			else if (c == '"') addtok(tokens, tok), tok = getstrlit(ln, i), addtok(tokens, tok);
-			else    addtok(tokens, tok), tok = string(c, 1), addtok(tokens, tok);
+			else    addtok(tokens, tok), tok = string(1, c), addtok(tokens, tok);
 		}
 		addtok(tokens, tok);
 		lines.push_back(tokens);
