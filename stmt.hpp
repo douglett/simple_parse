@@ -1,5 +1,5 @@
 #pragma once
-#include "inputfile.hpp"
+#include "globals.h"
 #include <string>
 using namespace std;
 
