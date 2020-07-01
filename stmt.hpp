@@ -33,17 +33,15 @@ struct Stmt_assign : Stmt_type {
 	int value = 0;
 
 	int build() {
-		printf("assign...\n");
-		if (!input.is_identifier()) input.die();
+		if (!input.is_identifier()) input.die(); // get variable name
 		name = input.peek();
 		input.next();
-		printf("asd\n");
-		if (input.peek() != "=") input.die("b");
+		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
-		if (!input.is_integer()) input.die("c");
+		if (!input.is_integer()) input.die(); // integer (expr?)
 		value = stoi(input.peek());
 		input.next();
-		if (!input.eol()) input.die();
+		if (!input.eol()) input.die(); // end-line
 		input.nextline();
 		return 0;
 	}
