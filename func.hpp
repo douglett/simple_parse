@@ -38,11 +38,14 @@ private:
 	}
 
 	void func_body() {
-		Stmt st;
 		while (!input.eof()) {
 			if      (input.peeklower() == "end") break; // expect end-function here
 			else if (input.eol()) input.nextline(); // skip empty lines
-			else    st.build(); // expect statement
+			else    { // expect statement
+				Stmt st;
+				st.build();
+				statements.push_back(st);
+			}
 		}
 	}
 };
