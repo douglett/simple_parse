@@ -44,7 +44,7 @@ struct InputFile {
 		return linepos >= rawlines.size();
 	}
 	int eol() const {
-		return pos >= getline().size();
+		return eof() || pos >= getline().size();
 	}
 	const vector<string>& getline() const {
 		return lines.at(linepos);

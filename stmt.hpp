@@ -1,5 +1,6 @@
 #pragma once
 #include "globals.hpp"
+#include "expr.hpp"
 #include <string>
 using namespace std;
 
@@ -10,19 +11,23 @@ struct Stmt_type {
 
 // print statements
 struct Stmt_print : Stmt_type {
-	vector<string> literals; // temp
+	struct PrintList {
+		string type, strlit;
+		Expr expr;
+		PrintList(const string& val) { type = "strlit"; strlit = val; }
+		PrintList(const Expr& val) { type = "expr"; expr = val; }
+	};
+	vector<PrintList> plist;
 
 	int build() {
-//		printf("parsing print...\n");
+		if (input.peeklower() != "print") input.die();
 		input.next();
 		while (true)
-			if   (input.is_strlit()) literals.push_back(input.peek()), input.next();
-			else break;
-		if (!input.eol()) input.die();
+			if      (input.eol()) break; // list end
+			else if (input.is_strlit()) plist.emplace_back(input.peek()), input.next(); // literal
+			else    plist.emplace_back(Expr()), plist.back().expr.build(); // should be expression
+		if (!input.eol()) input.die(); // expect endline
 		input.nextline();
-
-//		for (auto l : literals)
-//			printf("  literal: %s\n", l.c_str());
 		return 0;
 	}
 };
@@ -30,7 +35,7 @@ struct Stmt_print : Stmt_type {
 // assign statement
 struct Stmt_assign : Stmt_type {
 	string name;
-	int value = 0;
+	Expr expr;
 
 	int build() {
 		if (!input.is_identifier()) input.die(); // get variable name
@@ -38,9 +43,7 @@ struct Stmt_assign : Stmt_type {
 		input.next();
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
-		if (!input.is_integer()) input.die(); // integer (expr?)
-		value = stoi(input.peek());
-		input.next();
+		expr.build(); // get expression
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
 		return 0;
