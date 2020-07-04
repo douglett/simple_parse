@@ -65,9 +65,15 @@ public:
 		else    input.die();
 		return 0;
 	}
-	Stmt_type* get() {
-		if (type == "print")  return &stmt_print;
-		if (type == "assign") return &stmt_assign;
-		return this;
+	virtual Node makeast() const {
+		//if (type == "print")  return stmt_print.makeast();
+		//if (type == "assign") return stmt_assign.makeast();
+		//return makeast();
+		return { "statement", "TODO" };
 	}
+//	Stmt_type* get() {
+//		if (type == "print")  return &stmt_print;
+//		if (type == "assign") return &stmt_assign;
+//		return this;
+//	}
 };
