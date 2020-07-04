@@ -1,5 +1,6 @@
 SRC = main.cpp
-HEAD = func.hpp stmt.hpp inputfile.hpp
+HEAD = inputfile.hpp node.hpp globals.hpp \
+		func.hpp stmt.hpp expr.hpp
 OUT = main.out
 
 $(OUT): $(SRC) $(HEAD)

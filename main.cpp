@@ -11,4 +11,6 @@ int main() {
 
 	Func f;
 	f.build();
+	printf("::make-ast results::\n");
+	f.makeast().show(1);
 }

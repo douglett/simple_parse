@@ -17,6 +17,15 @@ struct Func {
 		func_end();
 		return 0;
 	}
+	Node makeast() const {
+		Node ast = { "function", func_name, {
+			{ "dims", "", {}},
+			{ "statements", "", {}},
+		}};
+		for (auto& st : statements)
+			ast.at("statements").push( st.makeast() );
+		return ast;
+	}
 
 private:
 	void func_start() {
@@ -24,7 +33,7 @@ private:
 		input.next();
 		if (!input.is_identifier()) input.die();
 		func_name = input.peek();
-		printf("function name: %s\n", func_name.c_str());
+		//printf("function name: %s\n", func_name.c_str());
 		input.next();
 		if (!input.eol()) input.die();
 		input.nextline();

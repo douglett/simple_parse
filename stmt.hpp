@@ -7,6 +7,7 @@ using namespace std;
 // generic statement base class
 struct Stmt_type {
 	virtual int build() { return 0; }
+	virtual Node makeast() const { return { "??" }; }
 };
 
 // print statements
@@ -54,17 +55,19 @@ struct Stmt_assign : Stmt_type {
 struct Stmt : Stmt_type {
 private:
 	string type;
-	Stmt_print  s_print;
-	Stmt_assign s_assign;
+	Stmt_print  stmt_print;
+	Stmt_assign stmt_assign;
 public:
 	int build() {
-		printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
-		if      (input.peeklower() == "print") type = "print", s_print.build();
-		else if (input.is_identifier()) type = "assign", s_assign.build();
+		//printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
+		if      (input.peeklower() == "print") type = "print", stmt_print.build();
+		else if (input.is_identifier()) type = "assign", stmt_assign.build();
 		else    input.die();
 		return 0;
 	}
 	Stmt_type* get() {
-		return &s_print;
+		if (type == "print")  return &stmt_print;
+		if (type == "assign") return &stmt_assign;
+		return this;
 	}
 };
