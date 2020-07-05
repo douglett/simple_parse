@@ -29,8 +29,8 @@ struct InputFile {
 		linepos = 0;
 		fs.close();
 
-		showrawlines();
-		showlines();
+		//showrawlines();
+		//showlines();
 		return 0;
 	}
 	void reset() {

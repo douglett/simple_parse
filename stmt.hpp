@@ -7,7 +7,7 @@ using namespace std;
 // generic statement base class
 struct Stmt_type {
 	virtual int build() { return 0; }
-	virtual Node makeast() const { return { "??" }; }
+	virtual int run() { return -1; }
 };
 
 // print statements
@@ -25,11 +25,29 @@ struct Stmt_print : Stmt_type {
 		input.next();
 		while (true)
 			if      (input.eol()) break; // list end
-			else if (input.is_strlit()) plist.emplace_back(input.peek()), input.next(); // literal
+			else if (input.is_strlit()) plist.emplace_back( escape_literal(input.peek()) ), input.next(); // literal
 			else    plist.emplace_back(Expr()), plist.back().expr.build(); // should be expression
 		if (!input.eol()) input.die(); // expect endline
 		input.nextline();
 		return 0;
+	}
+
+	int run() {
+		static const string spc = " ";
+		string str;
+		for (auto& pl : plist)
+			if      (pl.type == "strlit") str += pl.strlit + spc;
+			else if (pl.type == "expr") str += "0" + spc;
+			else    str += "??";
+		printf("%s\n", str.c_str());
+		return 0;
+	}
+
+private:
+	string escape_literal(string str) {
+		if (str.length() >= 2 && str.front() == '"' && str.back() == '"')
+			return str.substr(1, str.length()-2);
+		return str;
 	}
 };
 
@@ -65,15 +83,13 @@ public:
 		else    input.die();
 		return 0;
 	}
-	virtual Node makeast() const {
-		//if (type == "print")  return stmt_print.makeast();
-		//if (type == "assign") return stmt_assign.makeast();
-		//return makeast();
-		return { "statement", "TODO" };
+	int run() {
+		return get()->run();
 	}
-//	Stmt_type* get() {
-//		if (type == "print")  return &stmt_print;
-//		if (type == "assign") return &stmt_assign;
-//		return this;
-//	}
+	Stmt_type* get() {
+		if (type == "print")  return &stmt_print;
+		if (type == "assign") return &stmt_assign;
+		fprintf(stderr, "unknown statement type [%s]\n", type.c_str());
+		exit(1);
+	}
 };
