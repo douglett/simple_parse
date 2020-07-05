@@ -11,7 +11,7 @@ int main() {
 
 	Func f;
 	f.build();
-	printf("::make-ast results::\n");
+	//printf("::make-ast results::\n");
 	//f.makeast().show(1);
 	printf("::running program::\n");
 	int res = f.run();

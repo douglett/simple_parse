@@ -1,5 +1,5 @@
 SRC = main.cpp
-HEAD = inputfile.hpp globals.hpp \
+HEAD = inputfile.hpp programstack.hpp globals.hpp \
 		func.hpp stmt.hpp expr.hpp
 OUT = main.out
 

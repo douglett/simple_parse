@@ -1,14 +1,8 @@
 #pragma once
 #include "inputfile.hpp"
-//#include "node.hpp"
+#include "programstack.hpp"
 
 // global source file container
 InputFile input;
-
-//struct ProgramState {
-//	map<string, int> globals;
-//	vector<map<string, int>> stack;
-//
-//	int& get(const string& id) {
-//	}
-//};
+// global stack
+ProgramStack progstack;

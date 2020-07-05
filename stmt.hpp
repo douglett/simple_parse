@@ -37,7 +37,7 @@ struct Stmt_print : Stmt_type {
 		string str;
 		for (auto& pl : plist)
 			if      (pl.type == "strlit") str += pl.strlit + spc;
-			else if (pl.type == "expr") str += "0" + spc;
+			else if (pl.type == "expr") str += to_string(pl.expr.run()) + spc;
 			else    str += "??";
 		printf("%s\n", str.c_str());
 		return 0;
@@ -59,6 +59,7 @@ struct Stmt_assign : Stmt_type {
 	int build() {
 		if (!input.is_identifier()) input.die(); // get variable name
 		name = input.peek();
+		if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
 		input.next();
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
@@ -66,6 +67,10 @@ struct Stmt_assign : Stmt_type {
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
 		return 0;
+	}
+
+	int run() {
+		return progstack.set(name, expr.run()), 0;
 	}
 };
 
