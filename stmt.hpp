@@ -23,10 +23,16 @@ struct Stmt_print : Stmt_type {
 	int build() {
 		if (input.peeklower() != "print") input.die();
 		input.next();
-		while (true)
-			if      (input.eol()) break; // list end
-			else if (input.is_strlit()) plist.emplace_back( escape_literal(input.peek()) ), input.next(); // literal
+		int list_empty = input.eol(); // print can have no arguments (empty line)
+		while (!list_empty) {
+			// list contents
+			if      (input.is_strlit()) plist.emplace_back( escape_literal(input.peek()) ), input.next(); // literal
 			else    plist.emplace_back(Expr()), plist.back().expr.build(); // should be expression
+			// next list item
+			if      (input.eol()) break; // list end
+			else if (input.peek() == ",") input.next(); // next list item
+			else    input.die(); // otherwise error
+		}
 		if (!input.eol()) input.die(); // expect endline
 		input.nextline();
 		return 0;
