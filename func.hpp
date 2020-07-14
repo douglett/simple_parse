@@ -6,7 +6,7 @@ using namespace std;
 
 struct Func {
 	//const string ERR = "syntax error";
-	string func_name;
+	string name;
 	vector<Stmt_dim> dims;
 	vector<Stmt> statements;
 
@@ -20,7 +20,7 @@ struct Func {
 	int run() {
 		progstack.push();
 		for (auto& d : dims)
-			progstack.dim(d.name, d.expr.run());
+			d.run();
 		for (auto& s : statements)
 			s.run();
 		progstack.pop();
@@ -32,7 +32,7 @@ private:
 		if (input.peeklower() != "function") input.die(); // function keyword
 		input.next();
 		if (!input.is_identifier()) input.die(); // function name
-		func_name = input.peek();
+		name = input.peek();
 		//printf("function name: %s\n", func_name.c_str());
 		input.next();
 		if (!input.eol()) input.die(); // endline

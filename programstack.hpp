@@ -33,4 +33,7 @@ struct ProgramStack {
 		if (stack.size() == 0) return 0;
 		return stack.pop_back(), stack.size();
 	}
+	int reset() {
+		return globals = {}, stack = {}, 0;
+	}
 };

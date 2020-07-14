@@ -1,4 +1,4 @@
-function fart1  # my function
+function main  # my function
 	dim a
 	dim b = 1 + 1
 	a = 4

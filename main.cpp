@@ -1,5 +1,5 @@
 #include "globals.hpp"
-#include "func.hpp"
+#include "script.hpp"
 #include <iostream>
 using namespace std;
 
@@ -9,11 +9,8 @@ int main() {
 	// InputFile inf("test.bas");
 	input.load("test.bas");
 
-	Func f;
-	f.build();
-	//printf("::make-ast results::\n");
-	//f.makeast().show(1);
-	printf("::running program::\n");
-	int res = f.run();
+	Script s;
+	s.build();
+	int res = s.run();
 	printf("result: %d\n", res);
 }

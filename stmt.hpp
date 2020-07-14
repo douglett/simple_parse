@@ -100,6 +100,12 @@ struct Stmt_dim : Stmt_type {
 		input.nextline();
 		return 0;
 	}
+
+	int run() {
+		int val = expr.run();
+		progstack.dim(name, val);
+		return val;
+	}
 };
 
 // statement parser god class

@@ -1,6 +1,6 @@
 SRC = main.cpp
 HEAD = inputfile.hpp programstack.hpp globals.hpp \
-		func.hpp stmt.hpp expr.hpp
+		script.hpp func.hpp stmt.hpp expr.hpp
 OUT = main.out
 
 $(OUT): $(SRC) $(HEAD)
