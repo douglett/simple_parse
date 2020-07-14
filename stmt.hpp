@@ -80,6 +80,28 @@ struct Stmt_assign : Stmt_type {
 	}
 };
 
+// dim statement
+struct Stmt_dim : Stmt_type {
+	string name;
+	Expr expr;
+
+	int build() {
+		if (input.peeklower() != "dim") input.die(); // is dim statement
+		input.next();
+		if (!input.is_identifier()) input.die(); // expect identifier
+		name = input.peek(); // save dim name
+		input.next();
+		progstack.dim(name); // add dim name to current stack
+		if (input.peek() == "=") // optional assignement operation
+			input.next(), expr.build(); // get expression
+		else
+			expr.zero(); // default is zero (empty)
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
+		return 0;
+	}
+};
+
 // statement parser god class
 struct Stmt : Stmt_type {
 private:

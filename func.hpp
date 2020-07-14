@@ -7,7 +7,7 @@ using namespace std;
 struct Func {
 	//const string ERR = "syntax error";
 	string func_name;
-	vector<string> dims;
+	vector<Stmt_dim> dims;
 	vector<Stmt> statements;
 
 	int build() {
@@ -20,7 +20,7 @@ struct Func {
 	int run() {
 		progstack.push();
 		for (auto& d : dims)
-			progstack.dim(d);
+			progstack.dim(d.name, d.expr.run());
 		for (auto& s : statements)
 			s.run();
 		progstack.pop();
@@ -54,11 +54,8 @@ private:
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
 			else if (input.peeklower() == "dim") {
-				input.next();
-				if (!input.is_identifier()) input.die();
-				dims.push_back(input.peek()); // save to program def
-				progstack.dim(input.peek()); // save to state
-				input.next();
+				dims.push_back({});
+				dims.back().build();
 			}
 			else    break;
 	}

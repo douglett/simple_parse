@@ -14,6 +14,11 @@ struct Expr {
 		return 0;
 	}
 
+	int zero() {
+		*this = { "number", "0", {} };
+		return 0;
+	}
+
 	int run() {
 		if      (type == "identifier") return progstack.get(value);
 		else if (type == "number") return stoi(value);
