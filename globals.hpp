@@ -2,7 +2,5 @@
 #include "inputfile.hpp"
 #include "programstack.hpp"
 
-// global source file container
-InputFile input;
-// global stack
-ProgramStack progstack;
+InputFile input; // global source file container
+ProgramStack progstack; // global stack

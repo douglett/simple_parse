@@ -80,6 +80,26 @@ struct Stmt_assign : Stmt_type {
 	}
 };
 
+// call statement (temp?)
+struct Stmt_call : Stmt_type {
+	string name;
+
+	int build() {
+		if (input.peeklower() != "call") input.die(); // call keyword
+		input.next();
+		if (!input.is_identifier()) input.die(); // get function name
+		name = input.peek();
+		input.next();
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
+		return 0;
+	}
+
+	int run() {
+		return progstack.call(name);
+	}
+};
+
 // dim statement
 struct Stmt_dim : Stmt_type {
 	string name;
@@ -114,10 +134,12 @@ private:
 	string type;
 	Stmt_print  stmt_print;
 	Stmt_assign stmt_assign;
+	Stmt_call   stmt_call;
 public:
 	int build() {
 		//printf("%02d: stmt: %s\n", input.linepos+1, input.peek().c_str());
 		if      (input.peeklower() == "print") type = "print", stmt_print.build();
+		else if (input.peeklower() == "call") type = "call", stmt_call.build();
 		else if (input.is_identifier()) type = "assign", stmt_assign.build();
 		else    input.die();
 		return 0;
@@ -128,6 +150,7 @@ public:
 	Stmt_type* get() {
 		if (type == "print")  return &stmt_print;
 		if (type == "assign") return &stmt_assign;
+		if (type == "call")   return &stmt_call;
 		fprintf(stderr, "unknown statement type [%s]\n", type.c_str());
 		exit(1);
 	}

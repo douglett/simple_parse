@@ -5,9 +5,13 @@
 using namespace std;
 
 struct ProgramStack {
+	struct FunctionCaller {
+		virtual int call(const string& name) = 0;
+	};
 	typedef  map<string, int>  StackFrame;
 	StackFrame globals;
 	vector<StackFrame> stack;
+	FunctionCaller* caller = NULL;
 
 	void dim(const string& id, int val=0) {
 		auto& frame = stack.size() ? stack.back() : globals;
@@ -35,5 +39,9 @@ struct ProgramStack {
 	}
 	int reset() {
 		return globals = {}, stack = {}, 0;
+	}
+	int call(const string& name) {
+		if (!caller) fprintf(stderr, "ProgramStack: missing runtime function caller\n"), exit(1);
+		return caller->call(name);
 	}
 };

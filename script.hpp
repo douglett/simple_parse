@@ -4,7 +4,7 @@
 #include "stmt.hpp"
 using namespace std;
 
-struct Script {
+struct Script : ProgramStack::FunctionCaller {
 	vector<Stmt_dim> dims;
 	vector<Func> funcs;
 
@@ -21,9 +21,17 @@ struct Script {
 		progstack.reset();
 		for (auto& d : dims)
 			d.run();
+//		for (auto& f : funcs)
+//			if (f.name == "main") return f.run();
+//		return 0;
+		return call("main");
+	}
+
+	int call(const string& name) {
 		for (auto& f : funcs)
-			if (f.name == "main") return f.run();
-		return 0;
+			if (f.name == name) return f.run();
+		fprintf(stderr, "Script: missing function definition: %s\n", name.c_str()), exit(1);
+		//return 0;
 	}
 
 private:

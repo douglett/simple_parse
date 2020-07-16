@@ -10,6 +10,7 @@ int main() {
 	input.load("test.bas");
 
 	Script s;
+	progstack.caller = &s; // loop function lists back to global state
 	s.build();
 	int res = s.run();
 	printf("result: %d\n", res);
