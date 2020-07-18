@@ -10,7 +10,7 @@ struct Script : ProgramStack::FunctionCaller {
 
 	int build() {
 		progstack.reset(); // force new program stack
-		// hoist-funcs
+		script_hoist(); // hoist-funcs
 		// structs
 		script_dims();
 		script_funcs();
@@ -21,9 +21,6 @@ struct Script : ProgramStack::FunctionCaller {
 		progstack.reset();
 		for (auto& d : dims)
 			d.run();
-//		for (auto& f : funcs)
-//			if (f.name == "main") return f.run();
-//		return 0;
 		return call("main");
 	}
 
@@ -35,6 +32,20 @@ struct Script : ProgramStack::FunctionCaller {
 	}
 
 private:
+	void script_hoist() {
+		input.seekline(0); // goto start
+		while (!input.eof()) {
+			if (input.peek() == "function") {
+				input.next();
+				if (!input.is_identifier()) input.die(); // expect function name
+				string name = input.peek(); // get name
+				printf("script-hoist: %s\n", name.c_str());
+			}
+			input.nextline();
+		}
+		input.seekline(0); // goto start
+	}
+
 	void script_dims() {
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines

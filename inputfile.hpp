@@ -14,7 +14,7 @@ struct InputFile {
 
 	// initialising InputFile with source file
 	int load(const string& name) {
-		reset();
+		clearall();
 		std::fstream fs(name, ios::in);
 		if (!fs.is_open())
 			fprintf(stderr, "error opening file: %s\n", name.c_str()), exit(1);
@@ -33,10 +33,14 @@ struct InputFile {
 		//showlines();
 		return 0;
 	}
-	void reset() {
+	void clearall() {
 		lines = {};
 		rawlines = {};
 		linepos = pos = 0;
+	}
+	void seekline(int lno) {
+		linepos = lno < 0 || lno > (int)lines.size() ? lines.size() : lno;
+		pos = 0;
 	}
 
 	// parsing
