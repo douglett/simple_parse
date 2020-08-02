@@ -35,6 +35,7 @@ namespace parse {
 	}
 
 	Node _func_locals() {
+		printf("TODO: redef check global\n");
 		Node mylocals  = { "locals" }; // reset locals
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines

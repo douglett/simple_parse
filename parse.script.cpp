@@ -3,28 +3,37 @@ using namespace std;
 
 namespace parse {
 	InputFile  input; // global source file container
-	Node       globals, locals, funcs; // program results
+	Node       globals, locals, funcdecs, funcs; // program results
 	
+	void _script_hoist();
 	void _script_globals();
 	void _script_funcs();
 
 
 	int script(const std::string& fname) {
 		// reset
-		globals = { "globals" };
-		locals  = { "locals" };
-		funcs   = { "funcs" };
+		globals  = { "globals" };
+		locals   = { "locals" };
+		funcdecs = { "function-declarations" };
+		funcs    = { "functions" };
 		// load
 		if (input.load(fname)) exit(1);
 		// parse
+		_script_hoist(); // hoist-funcs
+		funcdecs.show();
 		_script_globals();
 		globals.show();
 		_script_funcs();
 		funcs.show();
 		return 0;
 	}
+	
+	void _script_hoist() {
+		printf("TODO: hoist\n");
+	}
 
 	void _script_globals() {
+		printf("TODO: redef check global\n");
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
 			else if (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim

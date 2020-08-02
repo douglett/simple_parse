@@ -56,6 +56,7 @@ namespace parse {
 		if (!input.is_identifier()) input.die(); // get function name
 		auto name = input.peek();
 		// if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
+		printf("TODO: call exists check\n");
 		input.next();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
