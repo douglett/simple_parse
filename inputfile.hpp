@@ -2,11 +2,12 @@
 #include <string>
 #include <vector>
 #include <fstream>
-using namespace std;
 
 struct InputFile {
-	vector<string> rawlines;
-	vector<vector<string>> lines;
+	typedef std::string string;
+	typedef std::vector<std::string> vecstr;
+	vecstr rawlines;
+	std::vector<vecstr> lines;
 	uint32_t linepos = 0, pos = 0;
 
 	InputFile() { }
@@ -15,10 +16,10 @@ struct InputFile {
 	// initialising InputFile with source file
 	int load(const string& name) {
 		clearall();
-		std::fstream fs(name, ios::in);
+		std::fstream fs(name, std::ios::in);
 		if (!fs.is_open())
-			fprintf(stderr, "error opening file: %s\n", name.c_str()), exit(1);
-		// return 1;
+			// fprintf(stderr, "error opening file: %s\n", name.c_str()), exit(1);
+			return fprintf(stderr, "error opening file: %s\n", name.c_str()), 1;
 
 		string s;
 		while(std::getline(fs, s)) {
@@ -50,7 +51,7 @@ struct InputFile {
 	int eol() const {
 		return eof() || pos >= getline().size();
 	}
-	const vector<string>& getline() const {
+	const vecstr& getline() const {
 		return lines.at(linepos);
 	}
 	const string& getrawline() const {
@@ -58,7 +59,7 @@ struct InputFile {
 	}
 
 	int is_keyword() const {
-		static const vector<string> KEYWORDS = {
+		static const vecstr KEYWORDS = {
 			"function", "end", "dim", "print" };
 		auto t = peek();
 		for (auto& k : KEYWORDS)
@@ -132,9 +133,15 @@ struct InputFile {
 		exit(1);
 	}
 
+	static string escape_strlit(const string& str) {
+		if (str.length() >= 2 && str.front() == '"' && str.back() == '"')
+			return str.substr(1, str.length()-2);
+		return str;
+	}
+
 private:
 	void parseline(const string& ln) {
-		vector<string> tokens;
+		vecstr tokens;
 		string tok;
 		for (int i = 0; i < (int)ln.length(); i++) {
 			auto c = ln[i];
@@ -158,7 +165,7 @@ private:
 		return tok;
 	}
 
-	int addtok(vector<string>& tokens, string& tok) {
+	int addtok(vecstr& tokens, string& tok) {
 		if (tok.length()) tokens.push_back(tok);
 		tok = "";
 		return 0;

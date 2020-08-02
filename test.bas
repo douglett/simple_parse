@@ -1,3 +1,5 @@
+dim global1
+
 function main  # my function
 	dim a
 	dim b = 1 + 1
