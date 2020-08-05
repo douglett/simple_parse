@@ -1,4 +1,5 @@
 #include "parse.hpp"
+#include <map>
 using namespace std;
 
 namespace parse {
@@ -30,14 +31,19 @@ namespace parse {
 	
 	void _script_hoist() {
 		printf("TODO: hoist\n");
+		printf("TODO: hoist function redef check\n");
 	}
 
 	void _script_globals() {
-		printf("TODO: redef check global\n");
+		// parse all dims
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
 			else if (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim
 			else    break; // end of dims
+		// check for duplicate values
+		map<string, int> gcount;
+		for (auto& g : globals.kids)
+			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
 	}
 	
 	void _script_funcs() {

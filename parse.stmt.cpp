@@ -19,7 +19,7 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // expect identifier
 		string name = input.peek(); // save dim name
-		// if (progstack.exists(name)) input.die("redefined-variable"); // error checking
+		// note: redim error checking handled in parent
 		input.next();
 		auto myexpr = expr_zero(); // default is zero (empty)
 		if (input.peek() == "=") // optional assignement operation

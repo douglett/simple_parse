@@ -1,4 +1,5 @@
 #include "parse.hpp"
+#include <map>
 using namespace std;
 
 namespace parse {
@@ -26,6 +27,7 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // function name
 		string name = input.peek();
+		// note: redefinition checks handled in 'hoist'
 		input.next();
 		if (!input.eol()) input.die(); // endline
 		input.nextline();
@@ -35,13 +37,17 @@ namespace parse {
 	}
 
 	Node _func_locals() {
-		printf("TODO: redef check global\n");
+		// parse all dims
 		Node mylocals  = { "locals" }; // reset locals
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
 			else if (input.peeklower() == "dim") mylocals.push(stmt_dim()); // make dim
 			else    break; // end of dims
 		return mylocals;
+		// check for duplicate values
+		map<string, int> gcount;
+		for (auto& g : globals.kids)
+			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
 	}
 
 	Node _func_body() {

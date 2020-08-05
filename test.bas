@@ -1,4 +1,7 @@
 dim global1
+#dim global1 = 2
+dim global2 = 2
+dim global3 = 2
 
 function main  # my function
 	dim a
