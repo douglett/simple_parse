@@ -8,21 +8,23 @@ namespace parse {
 	Node _func_end();
 
 	Node func() {
-		auto header = func_header();
-		locals      = _func_locals();
+		auto decl   = func_dec();
+		locals      = _func_locals(); // save locals in namespace, for error checking
 		auto body   = _func_body();
 		auto fend   = _func_end();
 		// return the function
-		auto name = header.at("name").value;
-		return { "function", name, {
+		auto name = decl.at("name").value;
+		Node myfunc = { "function", name, {
 			// header.at("name"),
-			header,
+			decl,
 			locals,
 			body
 		}};
+		locals = {}; // reset local variables
+		return myfunc;
 	}
 
-	Node func_header() {
+	Node func_dec() {
 		if (input.peeklower() != "function") input.die(); // function keyword
 		input.next();
 		if (!input.is_identifier()) input.die(); // function name
@@ -31,7 +33,7 @@ namespace parse {
 		input.next();
 		if (!input.eol()) input.die(); // endline
 		input.nextline();
-		return { "function-header", "", {
+		return { "function-declaration", "", {
 			{ "name", name }
 		}};
 	}
@@ -46,7 +48,7 @@ namespace parse {
 		return mylocals;
 		// check for duplicate values
 		map<string, int> gcount;
-		for (auto& g : globals.kids)
+		for (const auto& g : globals.kids)
 			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
 	}
 

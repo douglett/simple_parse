@@ -13,10 +13,10 @@ namespace parse {
 
 	int script(const std::string& fname) {
 		// reset
-		globals  = { "globals" };
-		locals   = { "locals" };
-		funcdecs = { "function-declarations" };
-		funcs    = { "functions" };
+		globals   = { "globals" };
+		locals    = { "locals" };
+		funcdecs  = { "function-declarations" };
+		funcs     = { "functions" };
 		// load
 		if (input.load(fname)) exit(1);
 		// parse
@@ -26,6 +26,20 @@ namespace parse {
 		globals.show();
 		_script_funcs();
 		funcs.show();
+		return 0;
+	}
+
+	int isdef(const std::string& name) {
+		for (const auto& g : globals.kids)
+			if (g.value == name) return 1;
+		for (const auto& l : locals.kids)
+			if (l.value == name) return 2;
+		return 0;
+	}
+	
+	int isdec(const std::string& name) {
+		for (auto& d : funcdecs.kids)
+			if (d.at("name").value == name) return 1;
 		return 0;
 	}
 	
@@ -42,7 +56,7 @@ namespace parse {
 			else    break; // end of dims
 		// check for duplicate values
 		map<string, int> gcount;
-		for (auto& g : globals.kids)
+		for (const auto& g : globals.kids)
 			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
 	}
 	
