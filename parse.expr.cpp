@@ -42,6 +42,7 @@ namespace parse {
 		if      (input.is_identifier()) {
 			// if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
 			input.next(), lhs.type = "identifier";
+			lhs = var_get(lhs.value);
 		}
 		else if (input.is_integer())    input.next(), lhs.type = "number";
 		else if (input.peek() == "(")   return _brackets();

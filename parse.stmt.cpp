@@ -71,15 +71,15 @@ namespace parse {
 	Node _stmt_assign() {
 		if (!input.is_identifier()) input.die(); // get variable name
 		auto name = input.peek();
-		// if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
 		input.next();
+		auto var = var_get(name);
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
 		auto myexpr = expr();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
 		return { "stmt-assign", "", {
-			{ "name", name },
+			var,
 			myexpr
 		}};
 	}

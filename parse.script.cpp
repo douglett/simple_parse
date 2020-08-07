@@ -6,6 +6,7 @@ namespace parse {
 	InputFile  input; // global source file container
 	Node       globals, locals, funcdecs, funcs; // program results
 	
+	int _isdef(const string& name);
 	void _script_hoist();
 	void _script_globals();
 	void _script_funcs();
@@ -28,18 +29,26 @@ namespace parse {
 		funcs.show();
 		return 0;
 	}
-
-	int isdef(const std::string& name) {
-		for (const auto& g : globals.kids)
-			if (g.value == name) return 1;
-		for (const auto& l : locals.kids)
-			if (l.value == name) return 2;
-		return 0;
-	}
 	
-	int isdec(const std::string& name) {
+	int isdec(const string& name) {
 		for (auto& d : funcdecs.kids)
 			if (d.at("name").value == name) return 1;
+		return 0;
+	}
+
+	Node var_get(const string& name) {
+		switch (_isdef(name)) {
+			case 1:  return { "var-local", name };
+			case 2:  return { "var-global", name };
+			default:  input.die("undefined-variable");  return {"??"}; // error checking
+		}
+	}
+
+	int _isdef(const string& name) {
+		for (const auto& l : locals.kids)
+			if (l.value == name) return 1;
+		for (const auto& g : globals.kids)
+			if (g.value == name) return 2;
 		return 0;
 	}
 	
