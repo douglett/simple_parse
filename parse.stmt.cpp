@@ -55,7 +55,7 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // get function name
 		auto name = input.peek();
-		script_getdecl(name); // make sure function declaration exists
+		script_get_decl(name); // make sure function declaration exists
 		input.next();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
@@ -68,7 +68,7 @@ namespace parse {
 		if (!input.is_identifier()) input.die(); // get variable name
 		auto name = input.peek();
 		input.next();
-		auto var = script_getvar(name);
+		auto var = script_get_var(name);
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
 		auto myexpr = expr();

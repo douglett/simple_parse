@@ -29,7 +29,8 @@ namespace parse {
 		return 0;
 	}
 	
-	Node script_getvar(const std::string& name) {
+	Node script_get_var(const std::string& name) {
+		// return the named variable, with scoping definition
 		for (const auto& l : locals.kids)
 			if (l.value == name) return { "var-local", name };
 		for (const auto& g : globals.kids)
@@ -38,7 +39,8 @@ namespace parse {
 		return { "??" };
 	}
 
-	Node script_getdecl(const std::string& name) {
+	Node script_get_decl(const std::string& name) {
+		// return the named function declaration
 		for (auto& d : decls.kids)
 			if (d.at("name").value == name) return d;
 		input.die("undefined-function: "+name); // error checking

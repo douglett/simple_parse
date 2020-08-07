@@ -7,8 +7,8 @@ namespace parse {
 	extern Node       globals, locals, decls, funcs; // program results
 	
 	int   script(const std::string& fname);
-	Node  script_getvar(const std::string& name);
-	Node  script_getdecl(const std::string& name);
+	Node  script_get_var(const std::string& name);
+	Node  script_get_decl(const std::string& name);
 	Node  func();
 	Node  func_decl();
 	Node  stmt();
