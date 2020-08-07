@@ -39,7 +39,7 @@ namespace parse {
 
 	Node _atom() {
 		auto value = input.peek();
-		if      (input.is_identifier()) return input.next(), var_get(value);
+		if      (input.is_identifier()) return input.next(), script_getvar(value);
 		else if (input.is_integer())    return input.next(), Node{ "number", value };
 		else if (input.peek() == "(")   return _brackets();
 		else    input.die();

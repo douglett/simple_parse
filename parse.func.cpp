@@ -8,7 +8,7 @@ namespace parse {
 	Node _func_end();
 
 	Node func() {
-		auto decl   = func_dec();
+		auto decl   = func_decl();
 		locals      = _func_locals(); // save locals in namespace, for error checking
 		auto body   = _func_body();
 		auto fend   = _func_end();
@@ -24,7 +24,7 @@ namespace parse {
 		return myfunc;
 	}
 
-	Node func_dec() {
+	Node func_decl() {
 		if (input.peeklower() != "function") input.die(); // function keyword
 		input.next();
 		if (!input.is_identifier()) input.die(); // function name

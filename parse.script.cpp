@@ -4,9 +4,8 @@ using namespace std;
 
 namespace parse {
 	InputFile  input; // global source file container
-	Node       globals, locals, funcdecs, funcs; // program results
+	Node       globals, locals, decls, funcs; // program results
 	
-	int  _isdef(const string& name);
 	void _script_hoist();
 	void _script_globals();
 	void _script_funcs();
@@ -16,13 +15,13 @@ namespace parse {
 		// reset
 		globals   = { "globals" };
 		locals    = { "locals" };
-		funcdecs  = { "function-declarations" };
+		decls     = { "function-declarations" };
 		funcs     = { "functions" };
 		// load
 		if (input.load(fname)) exit(1);
 		// parse
 		_script_hoist(); // hoist-funcs
-		funcdecs.show();
+		decls.show();
 		_script_globals();
 		globals.show();
 		_script_funcs();
@@ -30,26 +29,21 @@ namespace parse {
 		return 0;
 	}
 	
-	int isdec(const string& name) {
-		for (auto& d : funcdecs.kids)
-			if (d.at("name").value == name) return 1;
-		return 0;
-	}
-
-	Node var_get(const string& name) {
-		switch (_isdef(name)) {
-			case 1:  return { "var-local", name };
-			case 2:  return { "var-global", name };
-			default:  input.die("undefined-variable");  return { "??" }; // error checking
-		}
-	}
-
-	int _isdef(const string& name) {
+	Node script_getvar(const std::string& name) {
 		for (const auto& l : locals.kids)
-			if (l.value == name) return 1;
+			if (l.value == name) return { "var-local", name };
 		for (const auto& g : globals.kids)
-			if (g.value == name) return 2;
-		return 0;
+			if (g.value == name) return { "var-global", name };
+		input.die("undefined-variable: "+name); // error checking
+		return { "??" };
+	}
+
+	Node script_getdecl(const std::string& name) {
+		for (auto& d : decls.kids)
+			if (d.at("name").value == name) return d;
+		printf("TODO: call exists check\n");
+		// input.die("undefined-function: "+name); // error checking
+		return { "??" };
 	}
 	
 	void _script_hoist() {

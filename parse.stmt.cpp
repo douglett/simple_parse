@@ -55,11 +55,7 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // get function name
 		auto name = input.peek();
-		
-		// if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
-		printf("TODO: call exists check\n");
-		printf("CALL: %d\n", isdec(name));
-
+		script_getdecl(name); // make sure function declaration exists
 		input.next();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
@@ -72,7 +68,7 @@ namespace parse {
 		if (!input.is_identifier()) input.die(); // get variable name
 		auto name = input.peek();
 		input.next();
-		auto var = var_get(name);
+		auto var = script_getvar(name);
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
 		auto myexpr = expr();
