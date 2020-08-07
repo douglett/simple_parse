@@ -33,7 +33,7 @@ namespace parse {
 		input.next();
 		if (!input.eol()) input.die(); // endline
 		input.nextline();
-		return { "function-declaration", "", {
+		return { "function-declaration", name, {
 			{ "name", name }
 		}};
 	}

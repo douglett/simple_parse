@@ -41,22 +41,28 @@ namespace parse {
 	Node script_getdecl(const std::string& name) {
 		for (auto& d : decls.kids)
 			if (d.at("name").value == name) return d;
-		printf("TODO: call exists check\n");
-		// input.die("undefined-function: "+name); // error checking
+		input.die("undefined-function: "+name); // error checking
 		return { "??" };
 	}
 	
 	void _script_hoist() {
-		printf("TODO: hoist\n");
-		printf("TODO: hoist function redef check\n");
+		// find and parse all function declarations, forward-declaring them all
+		while (!input.eof())
+			if    (input.peeklower() == "function") decls.push(func_decl()); // parse function declaration
+			else  input.nextline(); // skip this line
+		input.seekline(0); // return to top of script for sequential parsing
+		// check for duplicate values
+		map<string, int> gcount;
+		for (const auto& d : decls.kids)
+			if (++gcount[d.value] > 1) input.die("function-declarations: duplicate ["+d.value+"]");
 	}
 
 	void _script_globals() {
 		// parse all dims
 		while (!input.eof())
-			if      (input.eol()) input.nextline(); // skip empty lines
-			else if (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim
-			else    break; // end of dims
+			if       (input.eol()) input.nextline(); // skip empty lines
+			else if  (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim
+			else     break; // end of dims
 		// check for duplicate values
 		map<string, int> gcount;
 		for (const auto& g : globals.kids)
@@ -64,10 +70,9 @@ namespace parse {
 	}
 	
 	void _script_funcs() {
-		while (!input.eof()) {
-			if      (input.eol()) input.nextline(); // skip whitespace
-			else if (input.peeklower() == "function") funcs.push(func()); // make function
-			else    break; // end of funcs
-		}
+		while (!input.eof())
+			if       (input.eol()) input.nextline(); // skip whitespace
+			else if  (input.peeklower() == "function") funcs.push(func()); // make function
+			else     break; // end of funcs
 	}
 }

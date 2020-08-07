@@ -11,6 +11,7 @@ function main  # my function
 	print "ass hole   blah", "mewmew", 101, a, b
 
 	call testfn
+	#call balls
 end function
 
 function testfn
