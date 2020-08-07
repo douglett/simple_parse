@@ -38,16 +38,12 @@ namespace parse {
 	}
 
 	Node _atom() {
-		Node lhs = { "??", input.peek() };
-		if      (input.is_identifier()) {
-			// if (!progstack.exists(name)) input.die("undefined-variable"); // error checking
-			input.next(), lhs.type = "identifier";
-			lhs = var_get(lhs.value);
-		}
-		else if (input.is_integer())    input.next(), lhs.type = "number";
+		auto value = input.peek();
+		if      (input.is_identifier()) return input.next(), var_get(value);
+		else if (input.is_integer())    return input.next(), Node{ "number", value };
 		else if (input.peek() == "(")   return _brackets();
 		else    input.die();
-		return lhs;
+		return  { "??" };
 	}
 
 	Node _brackets() {

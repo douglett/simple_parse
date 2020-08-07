@@ -6,7 +6,7 @@ namespace parse {
 	InputFile  input; // global source file container
 	Node       globals, locals, funcdecs, funcs; // program results
 	
-	int _isdef(const string& name);
+	int  _isdef(const string& name);
 	void _script_hoist();
 	void _script_globals();
 	void _script_funcs();
@@ -40,7 +40,7 @@ namespace parse {
 		switch (_isdef(name)) {
 			case 1:  return { "var-local", name };
 			case 2:  return { "var-global", name };
-			default:  input.die("undefined-variable");  return {"??"}; // error checking
+			default:  input.die("undefined-variable");  return { "??" }; // error checking
 		}
 	}
 
