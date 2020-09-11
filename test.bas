@@ -17,6 +17,6 @@ end function
 function testfn
 	dim a
 	dim arr[]  # or arr() ?
-	dim str[] = "hello world" .. "blah"
+	dim str[] = "hello world" .. 10+5 .. "blah"
 	print "running test func"
 end function

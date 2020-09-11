@@ -2,12 +2,18 @@
 using namespace std;
 
 namespace parse {
+	Node _str_concat();
 	int _op_concat();
 
 	Node strexp() {
+		auto myexpr = _str_concat(); // only one expression type at the moment
+		return { "string-expr", "", { myexpr }};
+	}
+
+	Node _str_concat() {
 		// "string" .. int .. "string"
 		if (!input.is_strlit()) input.die();
-		Node str_expr = { "string-expr" };
+		Node str_expr = { "concat" };
 		str_expr.push({ "string-literal", input.peek() }), input.next(); // string literal
 		// single dimension list of strings
 		while (true) {
