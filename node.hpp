@@ -24,7 +24,8 @@ struct Node {
 		return kids.back();
 	}
 	void show(int ind=0) const {
-		printf("%s%s: %s\n", string(ind*2, ' ').c_str(), type.c_str(), value.c_str());
+		// printf("%s%s: %s\n", string(ind*2, ' ').c_str(), type.c_str(), value.c_str());
+		printf("%s%s%s:%s %s\n", string(ind*2, ' ').c_str(), "\033[33m", type.c_str(), "\033[0m", value.c_str());
 		for (auto& n : kids)
 			n.show(ind+1);
 	}

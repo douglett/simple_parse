@@ -19,16 +19,40 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // expect identifier
 		string name = input.peek(); // save dim name
-		// note: redim error checking handled in parent
 		input.next();
-		auto myexpr = expr_zero(); // default is zero (empty)
-		if (input.peek() == "=") // optional assignement operation
-			input.next(), myexpr = expr(); // get expression
-		if (!input.eol()) input.die(); // end-line
-		input.nextline();
-		return { "dim", name, {
-			myexpr
-		}};
+		// note: redim error checking handled in parent
+
+		// dim array
+		if (input.peek() == "[") {
+			input.next();
+			Node mydim = { "dim_array", name }; // holds the array definition
+			// get array size
+			auto size_expr = expr_zero(); // default array size of zero
+			if (input.peek() != "]") size_expr = expr(); // if not empty brackets, get size expression
+			if (input.peek() != "]") input.die(); // array brackets end
+			input.next();
+			// get string expression
+			if (input.peek() == "=") { // optional assignement operation
+				input.next();
+				mydim.push( strexp() ); // create string expression and append
+			}
+			// end expression
+			if (!input.eol()) input.die(); // end-line
+			input.nextline();
+			return mydim;
+		}
+
+		// dim single int
+		else {
+			auto myexpr = expr_zero(); // default is zero (empty)
+			if (input.peek() == "=") // optional assignement operation
+				input.next(), myexpr = expr(); // get expression
+			if (!input.eol()) input.die(); // end-line
+			input.nextline();
+			return { "dim", name, {
+				myexpr
+			}};
+		}
 	}
 
 	Node _stmt_print() {
