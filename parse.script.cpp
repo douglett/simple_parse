@@ -54,9 +54,9 @@ namespace parse {
 			else  input.nextline(); // skip this line
 		input.seekline(0); // return to top of script for sequential parsing
 		// check for duplicate values
-		map<string, int> gcount;
-		for (const auto& d : decls.kids)
-			if (++gcount[d.value] > 1) input.die("function-declarations: duplicate ["+d.value+"]");
+		map<string, int> valcount;
+		for (const auto& val : decls.kids)
+			if (++valcount[val.value] > 1) input.die("function-declarations: duplicate ["+val.value+"]");
 	}
 
 	void _script_globals() {
@@ -66,9 +66,9 @@ namespace parse {
 			else if  (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim
 			else     break; // end of dims
 		// check for duplicate values
-		map<string, int> gcount;
-		for (const auto& g : globals.kids)
-			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
+		map<string, int> valcount;
+		for (const auto& val : globals.kids)
+			if (++valcount[val.value] > 1) input.die("globals: duplicate ["+val.value+"]");
 	}
 	
 	void _script_funcs() {

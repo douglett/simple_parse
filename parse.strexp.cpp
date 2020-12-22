@@ -5,6 +5,7 @@ namespace parse {
 	Node _str_concat();
 	int _op_concat();
 
+	// NOTE: only used in DIM []. deprecated for now
 	Node strexp() {
 		auto myexpr = _str_concat(); // only one expression type at the moment
 		return { "string-expr", "", { myexpr }};

@@ -24,22 +24,25 @@ namespace parse {
 
 		// dim array
 		if (input.peek() == "[") {
-			input.next();
-			Node mydim = { "dim_array", name }; // holds the array definition
-			// get array size
-			auto size_expr = expr_zero(); // default array size of zero
-			if (input.peek() != "]") size_expr = expr(); // if not empty brackets, get size expression
-			if (input.peek() != "]") input.die(); // array brackets end
-			input.next();
-			// get string expression
-			if (input.peek() == "=") { // optional assignement operation
-				input.next();
-				mydim.push( strexp() ); // create string expression and append
-			}
-			// end expression
-			if (!input.eol()) input.die(); // end-line
-			input.nextline();
-			return mydim;
+			// deprecated error
+			fprintf(stderr, "warning: arrays deprecated\n"), exit(1);
+			// 
+			// input.next();
+			// Node mydim = { "dim_array", name }; // holds the array definition
+			// // get array size
+			// auto size_expr = expr_zero(); // default array size of zero
+			// if (input.peek() != "]") size_expr = expr(); // if not empty brackets, get size expression
+			// if (input.peek() != "]") input.die(); // array brackets end
+			// input.next();
+			// // get string expression
+			// if (input.peek() == "=") { // optional assignement operation
+			// 	input.next();
+			// 	mydim.push( strexp() ); // create string expression and append
+			// }
+			// // end expression
+			// if (!input.eol()) input.die(); // end-line
+			// input.nextline();
+			// return mydim;
 		}
 
 		// dim single int

@@ -1,0 +1,21 @@
+TODO.txt
+
+:: Dec 2020 ::
+
+- function arguments!
+- add system headers for inbuilt functions (how?)
+
+- array decs too complicated for the moment. replace with pointers!
+- add pointer decs + malloc (?)
+	- DIM ptr[] = malloc(100)
+	- free(ptr)
+	- a + b[0]
+	- (probably requires type checking at some later stage)
+
+- possibly add DATA keyword? WIP - work on this syntax
+	- DIM d1[] ( = malloc(0) ??? )
+	- malloc d1, 100
+	- DATA d1 10, 5, 100, 1000  // overwrites d1
+	- DATA d2 "hello world"
+	- arrcat(p1, d2)
+	- dump (?) d1 "hello world", 1, 1*2  // same syntax as print, but for arrays?

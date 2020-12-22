@@ -29,12 +29,34 @@ namespace parse {
 		input.next();
 		if (!input.is_identifier()) input.die(); // function name
 		string name = input.peek();
-		// note: redefinition checks handled in 'hoist'
+		input.next(); // note: redefinition checks handled in '_script_hoist'
+		// function arguments start
+		if (input.peek() != "(") input.die();
 		input.next();
-		if (!input.eol()) input.die(); // endline
+
+		// arguments list
+		Node args = { "arguments" };
+		while (true) {
+			if (!input.is_identifier()) break;
+			args.push({ "dim", input.peek() });
+			input.next();
+			if (input.peek() != ",") break;
+			input.next(); // eat comma
+		}
+		// check for duplicate arguments
+		map<string, int> valcount;
+		for (const auto& val : args.kids)
+			if (++valcount[val.value] > 1) input.die("function-arguments: duplicate ["+val.value+"]");
+
+		// function arguments end
+		if (input.peek() != ")") input.die();
+		input.next();
+		// end line
+		if (!input.eol()) input.die();
 		input.nextline();
 		return { "function-declaration", name, {
-			{ "name", name }
+			{ "name", name },
+			args
 		}};
 	}
 
@@ -46,10 +68,10 @@ namespace parse {
 			else if (input.peeklower() == "dim") mylocals.push(stmt_dim()); // make dim
 			else    break; // end of dims
 		return mylocals;
-		// check for duplicate values
-		map<string, int> gcount;
-		for (const auto& g : globals.kids)
-			if (++gcount[g.value] > 1) input.die("globals: duplicate ["+g.value+"]");
+		// check for duplicate local variables
+		map<string, int> valcount;
+		for (const auto& val : locals.kids)
+			if (++valcount[val.value] > 1) input.die("globals: duplicate ["+val.value+"]");
 	}
 
 	Node _func_body() {
