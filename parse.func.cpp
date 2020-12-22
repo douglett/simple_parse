@@ -44,9 +44,7 @@ namespace parse {
 			input.next(); // eat comma
 		}
 		// check for duplicate arguments
-		map<string, int> valcount;
-		for (const auto& val : args.kids)
-			if (++valcount[val.value] > 1) input.die("function-arguments: duplicate ["+val.value+"]");
+		check_dup_values(args, "function-arguments");
 
 		// function arguments end
 		if (input.peek() != ")") input.die();
@@ -69,9 +67,7 @@ namespace parse {
 			else    break; // end of dims
 		return mylocals;
 		// check for duplicate local variables
-		map<string, int> valcount;
-		for (const auto& val : locals.kids)
-			if (++valcount[val.value] > 1) input.die("globals: duplicate ["+val.value+"]");
+		check_dup_values(locals, "locals");
 	}
 
 	Node _func_body() {

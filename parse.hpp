@@ -16,4 +16,8 @@ namespace parse {
 	Node  expr();
 	Node  expr_zero();
 	// Node  strexp();
+
+
+	// not sure where to put this stuff
+	void check_dup_values(const Node& nlist, const std::string& errname);
 }
