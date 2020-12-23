@@ -3,13 +3,13 @@
 using namespace std;
 
 namespace parse {
-	Node _func_locals();
+	Node _func_locals(const Node& arguments);
 	Node _func_body();
 	Node _func_end();
 
 	Node func() {
 		auto decl   = func_decl();
-		locals      = _func_locals(); // save locals in namespace, for error checking
+		locals      = _func_locals( decl.at("arguments") ); // save locals in namespace, for error checking
 		auto body   = _func_body();
 		auto fend   = _func_end();
 		// return the function
@@ -58,16 +58,25 @@ namespace parse {
 		}};
 	}
 
-	Node _func_locals() {
+	Node _func_locals(const Node& arguments) {
 		// parse all dims
 		Node mylocals  = { "locals" }; // reset locals
+		// copy arguments into local variables
+		int argc = 0;
+		for (auto arg : arguments.kids) {
+			arg.push({ "argument", to_string(argc) });
+			mylocals.push(arg);
+			argc++;
+		}
+		// parse local variables
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
 			else if (input.peeklower() == "dim") mylocals.push(stmt_dim()); // make dim
 			else    break; // end of dims
-		return mylocals;
-		// check for duplicate local variables
+		// check for duplicate local variables (will also check clones argument names)
 		check_dup_values(locals, "locals");
+		// return
+		return mylocals;
 	}
 
 	Node _func_body() {
