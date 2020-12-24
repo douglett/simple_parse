@@ -6,8 +6,13 @@ TODO.txt
 	- arg duplicate check  X
 	- inner define and redefine check  X
 		- use inner definition  X
+- function call arguments  X
+	- arguments syntax  X
+	- arg count check  X
 - function calls in expressions (default return int)
 - add system headers for inbuilt functions (how?)
+	- implement malloc & free? or add keywords?
+- array accessors in expressions
 
 - array decs too complicated for the moment. replace with pointers!
 	- remove  X

@@ -7,7 +7,7 @@ function main()  # my function
 	dim b = 1 + 1
 	a = 3 + a + 10 - 2*4
 	print "ass hole   blah", "mewmew", 101, a, b
-	call testfn
+	call testfn(1, 1, b+2)
 end function
 
 function testfn(a, b, c)
