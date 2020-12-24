@@ -81,35 +81,8 @@ namespace parse {
 		// call keyword and function name
 		if (input.peeklower() != "call") input.die(); // call keyword
 		input.next();
-		if (!input.is_identifier()) input.die(); // get function name
-		auto name = input.peek();
-		input.next();
-		// arguments list start
-		if (input.peek() != "(") input.die(); 
-		input.next();
-		// comma seperated argument list
-		Node args = { "arguments" };
-		while (true) {
-			if (input.peek() == ")") break; // break on close-bracket. list can be empty
-			args.push(expr());
-			if (input.peek() != ",") break; // make sure list is comma-seperated
-			input.next();
-		}
-		// argument list end
-		if (input.peek() != ")") input.die();
-		input.next();
-		// argument count check
-		auto decl   = script_get_decl(name); // get global declaration. forces existance check
-		int decarg  = decl.at("arguments").length(), 
-			callarg = args.length();
-		if (decarg != callarg) 
-			input.die("call: expected " + to_string(decarg) + " arguments (got " + to_string(callarg) + ")");
-		// statement end
-		if (!input.eol()) input.die(); // end-line
-		input.nextline();
 		return { "stmt-call", "", {
-			{ "name", name },
-			args
+			expr_call()
 		}};
 	}
 

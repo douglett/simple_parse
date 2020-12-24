@@ -15,6 +15,7 @@ namespace parse {
 	Node  stmt_dim();
 	Node  expr();
 	Node  expr_zero();
+	Node  expr_call();
 	// Node  strexp();
 
 

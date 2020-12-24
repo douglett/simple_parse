@@ -33,7 +33,6 @@ namespace parse {
 		// function arguments start
 		if (input.peek() != "(") input.die();
 		input.next();
-
 		// arguments list
 		Node args = { "arguments" };
 		while (true) {
@@ -45,7 +44,6 @@ namespace parse {
 		}
 		// check for duplicate arguments
 		check_dup_values(args, "function-arguments");
-
 		// function arguments end
 		if (input.peek() != ")") input.die();
 		input.next();

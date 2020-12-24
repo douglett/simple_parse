@@ -9,7 +9,7 @@ TODO.txt
 - function call arguments  X
 	- arguments syntax  X
 	- arg count check  X
-- function calls in expressions (default return int)
+- function calls in expressions (default return int)  X
 - add system headers for inbuilt functions (how?)
 	- implement malloc & free? or add keywords?
 - array accessors in expressions
