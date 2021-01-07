@@ -1,5 +1,12 @@
 TODO.txt
 
+:: Jan 2021 ::
+
+- add system headers for inbuilt functions  X
+	- added system keyword  X
+	- implement malloc, free, realloc  X
+
+
 :: Dec 2020 ::
 
 - function arguments  X
@@ -10,12 +17,9 @@ TODO.txt
 	- arguments syntax  X
 	- arg count check  X
 - function calls in expressions (default return int)  X
-- add system headers for inbuilt functions (how?)
-	- implement malloc & free? or add keywords?
-- array accessors in expressions
-
 - array decs too complicated for the moment. replace with pointers!
 	- remove  X
+- array accessors in expressions  X
 - thoughts:
 	- add pointer decs + malloc (?)
 		- DIM ptr[] = malloc(100)

@@ -1,6 +1,11 @@
+system function malloc(size)
+system function realloc(pointer, size)
+system function free(pointer)
+system function ioredirect(iotype, pointer)
+
 dim global1
 dim global2 = 2
-dim a
+dim a = malloc(100)
 
 function main()  # my function
 	dim a

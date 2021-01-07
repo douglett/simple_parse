@@ -52,8 +52,17 @@ namespace parse {
 		input.nextline();
 		return { "function-declaration", name, {
 			{ "name", name },
+			{ "scope", "script (default?)" },
 			args
 		}};
+	}
+
+	Node func_decl_sys() {
+		if (input.peeklower() != "system") input.die(); // system keyword
+		input.next();
+		auto decl = func_decl();
+		decl.at("scope").value = "system";
+		return decl;
 	}
 
 	Node _func_locals(const Node& arguments) {

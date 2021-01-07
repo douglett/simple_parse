@@ -11,6 +11,7 @@ namespace parse {
 	Node  script_get_decl(const std::string& name);
 	Node  func();
 	Node  func_decl();
+	Node  func_decl_sys();
 	Node  stmt();
 	Node  stmt_dim();
 	Node  expr();

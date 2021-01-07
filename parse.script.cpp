@@ -7,6 +7,7 @@ namespace parse {
 	Node       globals, locals, decls, funcs; // program results
 	
 	void _script_hoist();
+	void _script_system();
 	void _script_globals();
 	void _script_funcs();
 
@@ -22,10 +23,12 @@ namespace parse {
 		// parse
 		_script_hoist(); // hoist-funcs
 		decls.show();
+		_script_system(); // clear system funcs
 		_script_globals();
 		globals.show();
 		_script_funcs();
 		funcs.show();
+		if (!input.eof()) input.die("expected EOF");
 		return 0;
 	}
 	
@@ -50,11 +53,20 @@ namespace parse {
 	void _script_hoist() {
 		// find and parse all function declarations, forward-declaring them all
 		while (!input.eof())
-			if    (input.peeklower() == "function") decls.push(func_decl()); // parse function declaration
-			else  input.nextline(); // skip this line
+			if       (input.peeklower() == "function") decls.push(func_decl()); // parse function declaration
+			else if  (input.peeklower() == "system"  ) decls.push(func_decl_sys()); // parse system function declaration
+			else     input.nextline(); // skip this line
 		input.seekline(0); // return to top of script for sequential parsing
 		// check for duplicate values
 		check_dup_values(decls, "function-declarations");
+	}
+
+	void _script_system() {
+		// clear system funcs
+		while (!input.eof())
+			if       (input.eol()) input.nextline(); // skip empty lines
+			else if  (input.peeklower() == "system") input.nextline(); // just assume this was handled in hoist
+			else     break; // end system
 	}
 
 	void _script_globals() {
