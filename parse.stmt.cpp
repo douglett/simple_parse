@@ -3,11 +3,13 @@ using namespace std;
 
 namespace parse {
 	Node _stmt_print();
+	Node _stmt_input();
 	Node _stmt_call();
 	Node _stmt_assign();
 
 	Node stmt() {
 		if      (input.peeklower() == "print") return _stmt_print();
+		if      (input.peeklower() == "input") return _stmt_input();
 		else if (input.peeklower() == "call")  return _stmt_call();
 		else if (input.is_identifier())        return _stmt_assign();
 		else    input.die();
@@ -75,6 +77,28 @@ namespace parse {
 		if (!input.eol()) input.die(); // expect endline
 		input.nextline();
 		return stmt;
+	}
+	
+	Node _stmt_input() {
+		if (input.peeklower() != "input") input.die();
+		input.next();
+		// check for custom text prompt
+		string prompt = "\"> \"";
+		if (input.is_strlit()) {
+			prompt = input.peek();
+			input.next();
+			if (input.peek() != ",") input.die(); // expect comma
+			input.next();
+		}
+		// get assignment target
+		auto name = input.peek();
+		input.next();
+		auto var = script_get_var(name);
+		// return
+		return { "stmt-input", "", {
+			{ "prompt", prompt },
+			var
+		}};
 	}
 
 	Node _stmt_call() {

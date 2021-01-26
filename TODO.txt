@@ -5,6 +5,13 @@ TODO.txt
 - add system headers for inbuilt functions  X
 	- added system keyword  X
 	- implement malloc, free, realloc  X
+	- implement ioredirect()  X
+- assign to array accessor!
+- add input keyword  X
+	- input a  # results go into memory malloc'd to a
+	- input "prompt: ", a  # as above with user defined prompt (string literal)
+- hello world, and hello <user> program!
+- add consts, global consts, system consts (or #define alternative)
 
 
 :: Dec 2020 ::
