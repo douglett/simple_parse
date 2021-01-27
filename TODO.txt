@@ -3,6 +3,7 @@ TODO.txt
 :: Jan pt2 2021 ::
 	- multiple input files  X
 	- dim assignment race condition  X
+	- assign to array accessor  X
 
 
 :: Jan 2021 ::
@@ -13,10 +14,9 @@ TODO.txt
 	- add input keyword  X
 		- input a  # results go into memory malloc'd to a
 		- input "prompt: ", a  # as above with user defined prompt (string literal)
-	- modify print command to print strings ($), numbers(%, default), raw/char(?? @)
 	- hello world, and hello <user> program!  X
+	- modify print command to print strings ($), numbers(%, default), raw/char(?? @)
 	- add consts, global consts, system consts (or #define alternative)
-	- assign to array accessor
 
 
 :: Dec 2020 ::

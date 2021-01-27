@@ -18,6 +18,7 @@ namespace parse {
 	Node  expr();
 	Node  expr_zero();
 	Node  expr_call();
+	Node  expr_assignable();
 	// Node  strexp();
 
 

@@ -11,6 +11,7 @@ system function ioredirect(iotype, pointer)
 function concat(dest, source)
 	dim dsize = sizeof(dest)
 	dim ssize = sizeof(source)
+	#dim i = 0
 	call realloc(dest, dsize + ssize)
 	#for i = 0 to ssize step 1
 	#	dest[dsize + i] = ssize[i]

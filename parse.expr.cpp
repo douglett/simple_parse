@@ -18,10 +18,20 @@ namespace parse {
 	}
 
 	Node expr_call() {
+		// return call expression, or error
 		if (!input.is_identifier()) input.die();
 		auto name = input.peek();
 		input.next();
 		return _call(name);
+	}
+
+	Node expr_assignable() {
+		// return assignable variable, array_index, or error
+		if (!input.is_identifier()) input.die();
+		auto name = input.peek();
+		input.next();
+		if    (input.peek() == "[")  return _array_index(name);
+		else  return script_get_var(name);
 	}
 
 	Node _term() {
@@ -50,6 +60,7 @@ namespace parse {
 		auto value = input.peek();
 		if      (input.is_identifier()) {
 			input.next();
+			// a bit of duplication here with expr_assignable above. OK?
 			if      (input.peek() == "(")  return _call(value);
 			else if (input.peek() == "[")  return _array_index(value);
 			else    return script_get_var(value);

@@ -91,9 +91,7 @@ namespace parse {
 			input.next();
 		}
 		// get assignment target
-		auto name = input.peek();
-		input.next();
-		auto var = script_get_var(name);
+		auto var = expr_assignable();
 		// return
 		return { "stmt-input", "", {
 			{ "prompt", prompt },
@@ -111,10 +109,9 @@ namespace parse {
 	}
 
 	Node _stmt_assign() {
-		if (!input.is_identifier()) input.die(); // get variable name
-		auto name = input.peek();
-		input.next();
-		auto var = script_get_var(name);
+		// get assignment target
+		auto var = expr_assignable();
+		// get expression to assign
 		if (input.peek() != "=") input.die(); // assignement operation
 		input.next();
 		auto myexpr = expr();
