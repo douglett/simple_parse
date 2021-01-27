@@ -3,13 +3,15 @@
 using namespace std;
 
 namespace parse {
-	Node _func_locals(const Node& arguments);
+	Node _func_args(const Node& arguments);
+	void _func_locals();
 	Node _func_body();
 	Node _func_end();
 
 	Node func() {
 		auto decl   = func_decl();
-		locals      = _func_locals( decl.at("arguments") ); // save locals in namespace, for error checking
+		locals      = _func_args( decl.at("arguments") ); // save locals in namespace, for error checking
+					  _func_locals();
 		auto body   = _func_body();
 		auto fend   = _func_end();
 		// return the function
@@ -65,8 +67,7 @@ namespace parse {
 		return decl;
 	}
 
-	Node _func_locals(const Node& arguments) {
-		// parse all dims
+	Node _func_args(const Node& arguments) {
 		Node mylocals  = { "locals" }; // reset locals
 		// copy arguments into local variables
 		int argc = 0;
@@ -75,15 +76,17 @@ namespace parse {
 			mylocals.push(arg);
 			argc++;
 		}
+		check_dup_values(locals, "local-arguments"); // check for duplicate local variables (will also check clones argument names)
+		return mylocals; // return
+	}
+
+	void _func_locals() {
 		// parse local variables
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
-			else if (input.peeklower() == "dim") mylocals.push(stmt_dim()); // make dim
+			else if (input.peeklower() == "dim") locals.push(stmt_dim()); // make dim
 			else    break; // end of dims
-		// check for duplicate local variables (will also check clones argument names)
-		check_dup_values(locals, "locals");
-		// return
-		return mylocals;
+		check_dup_values(locals, "locals"); // check for duplicate local variables (will also check clones argument names)
 	}
 
 	Node _func_body() {

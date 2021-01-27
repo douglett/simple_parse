@@ -2,7 +2,7 @@ TODO.txt
 
 :: Jan pt2 2021 ::
 	- multiple input files  X
-	- dim assignment race condition
+	- dim assignment race condition  X
 
 
 :: Jan 2021 ::
