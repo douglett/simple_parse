@@ -12,13 +12,18 @@ namespace parse {
 	void _script_funcs();
 
 
-	int script(const std::string& fname) {
-		// reset
+	int init() {
+		// initialise or reset environment
 		globals   = { "globals" };
 		locals    = { "locals" };
 		decls     = { "function-declarations" };
 		funcs     = { "functions" };
+		return 0;
+	}
+	
+	int script(const std::string& fname) {
 		// load
+		printf(">>> %s\n", fname.c_str());
 		if (input.load(fname)) exit(1);
 		// parse
 		_script_hoist(); // hoist-funcs

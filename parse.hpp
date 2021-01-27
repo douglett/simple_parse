@@ -6,6 +6,7 @@ namespace parse {
 	extern InputFile  input; // global source file container
 	extern Node       globals, locals, decls, funcs; // program results
 	
+	int   init();
 	int   script(const std::string& fname);
 	Node  script_get_var(const std::string& name);
 	Node  script_get_decl(const std::string& name);
