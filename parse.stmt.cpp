@@ -5,12 +5,14 @@ namespace parse {
 	Node _stmt_print();
 	Node _stmt_input();
 	Node _stmt_call();
+	Node _stmt_while();
 	Node _stmt_assign();
 
 	Node stmt() {
 		if      (input.peeklower() == "print") return _stmt_print();
 		if      (input.peeklower() == "input") return _stmt_input();
 		else if (input.peeklower() == "call")  return _stmt_call();
+		else if (input.peeklower() == "while") return _stmt_while();
 		else if (input.is_identifier())        return _stmt_assign();
 		else    input.die();
 		return { "??" }; // should die before here
@@ -60,6 +62,25 @@ namespace parse {
 		}
 	}
 
+	Node stmt_block(std::string blocktype) {
+		Node block = { "stmt-block" };
+		// get all statements in block
+		while (!input.eof())
+			if      (input.peeklower() == "end") break; // expect end-function here
+			else if (input.eol()) input.nextline(); // skip empty lines
+			else    block.push( stmt() ); // expect statement
+		// check block end
+		if (input.peeklower() != "end") input.die(); // end keyword
+		input.next();
+		for (char& c : blocktype) c = tolower(c); // convert block type to lower case
+		if (input.peeklower() != blocktype) input.die("expected block end [" + blocktype + "]"); // function keyword
+		input.next();
+		if (!input.eol()) input.die(); // endline
+		input.nextline();
+		// result
+		return block;
+	}
+
 	Node _stmt_print() {
 		Node stmt = { "stmt-print" };
 		if (input.peeklower() != "print") input.die();
@@ -92,7 +113,9 @@ namespace parse {
 		}
 		// get assignment target
 		auto var = expr_assignable();
-		// return
+		// end statement
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
 		return { "stmt-input", "", {
 			{ "prompt", prompt },
 			var
@@ -103,8 +126,24 @@ namespace parse {
 		// call keyword and function name
 		if (input.peeklower() != "call") input.die(); // call keyword
 		input.next();
+		auto mycall = expr_call();
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
 		return { "stmt-call", "", {
-			expr_call()
+			mycall
+		}};
+	}
+
+	Node _stmt_while() {
+		if (input.peeklower() != "while") input.die(); // keyword
+		input.next();
+		auto condition = expr();
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
+		auto block = stmt_block("while"); // get statement block
+		return { "stmt-while", "", {
+			condition,
+			block
 		}};
 	}
 

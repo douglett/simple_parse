@@ -15,6 +15,7 @@ namespace parse {
 	Node  func_decl_sys();
 	Node  stmt();
 	Node  stmt_dim();
+	Node  stmt_block(std::string blocktype);
 	Node  expr();
 	Node  expr_zero();
 	Node  expr_call();

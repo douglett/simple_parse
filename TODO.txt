@@ -4,6 +4,11 @@ TODO.txt
 	- multiple input files  X
 	- dim assignment race condition  X
 	- assign to array accessor  X
+	- while loop  X
+	- comparison operators in expression
+	- if statement
+	- return statement (int)
+	- break while / continue while
 
 
 :: Jan 2021 ::

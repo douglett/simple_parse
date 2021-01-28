@@ -50,7 +50,7 @@ namespace parse {
 	Node script_get_decl(const std::string& name) {
 		// return the named function declaration
 		for (auto& d : decls.kids)
-			if (d.at("name").value == name) return d;
+			if (d.value == name) return d;
 		input.die("undefined-function: "+name); // error checking
 		return { "??" };
 	}

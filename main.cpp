@@ -7,5 +7,5 @@ int main() {
 	parse::init();
 	// parse::script("tests/test.bas");
 	parse::script("tests/stdlib.bas");
-	parse::script("tests/01.hello.bas");
+	// parse::script("tests/01.hello.bas");
 }
