@@ -7,6 +7,7 @@ TODO.txt
 	- while loop  X
 	- comparison operators in expression  X
 	- if statement
+		- else if / else
 	- return statement (int)
 	- break while / continue while
 

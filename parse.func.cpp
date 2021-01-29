@@ -11,7 +11,8 @@ namespace parse {
 		locals      = { "locals" }; // reset locals. saved in namespace
 			_func_args( decl.at("arguments") );
 			_func_locals();
-		auto block  = stmt_block("function");
+		auto block  = stmt_block();
+		auto endfn  = stmt_block_end("function");
 		// return the function
 		auto name = decl.value;
 		Node myfunc = { "function", name, {

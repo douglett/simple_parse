@@ -6,6 +6,7 @@ namespace parse {
 	Node _stmt_input();
 	Node _stmt_call();
 	Node _stmt_while();
+	Node _stmt_if();
 	Node _stmt_assign();
 
 	Node stmt() {
@@ -13,6 +14,7 @@ namespace parse {
 		if      (input.peeklower() == "input") return _stmt_input();
 		else if (input.peeklower() == "call")  return _stmt_call();
 		else if (input.peeklower() == "while") return _stmt_while();
+		else if (input.peeklower() == "if")    return _stmt_if();
 		else if (input.is_identifier())        return _stmt_assign();
 		else    input.die();
 		return { "??" }; // should die before here
@@ -62,24 +64,29 @@ namespace parse {
 		}
 	}
 
-	Node stmt_block(std::string blocktype) {
+	Node stmt_block() {
 		Node block = { "stmt-block" };
 		// get all statements in block
 		while (!input.eof())
-			if      (input.peeklower() == "end") break; // expect end-function here
-			else if (input.eol()) input.nextline(); // skip empty lines
+			if      (input.eol()) input.nextline(); // skip empty lines
+			else if (input.peeklower() == "end" ) break; // expect end-function here
+			else if (input.peeklower() == "else") break; // pecial case for if-statement blocks
 			else    block.push( stmt() ); // expect statement
+		// result
+		return block;
+	}
+
+	Node stmt_block_end(const std::string& blocktype) {
 		// check block end
 		if (input.peeklower() != "end") input.die(); // end keyword
 		input.next();
-		for (char& c : blocktype) c = tolower(c); // convert block type to lower case
 		if (input.peeklower() != blocktype) input.die("expected block end [" + blocktype + "]"); // function keyword
 		input.next();
 		if (!input.eol()) input.die(); // endline
 		input.nextline();
-		// result
-		return block;
-	}
+		// just return Node for consistency
+		return { "stmt-block-end", blocktype };
+	} 
 
 	Node _stmt_print() {
 		Node stmt = { "stmt-print" };
@@ -140,8 +147,28 @@ namespace parse {
 		auto condition = expr();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
-		auto block = stmt_block("while"); // get statement block
+		auto block = stmt_block(); // get statement block
+		auto endw  = stmt_block_end("while");
 		return { "stmt-while", "", {
+			condition,
+			block
+		}};
+	}
+
+	Node _stmt_if() {
+		if (input.peeklower() != "if") input.die(); // keyword
+		input.next();
+		auto condition = expr();
+		if (!input.eol()) input.die(); // end-line
+		input.nextline();
+		
+		auto block = stmt_block(); // get statement block
+
+		// if (input.peek() == "else") printf("else!!1\n");
+
+		auto endif = stmt_block_end("if");
+		
+		return { "stmt-if", "", {
 			condition,
 			block
 		}};
