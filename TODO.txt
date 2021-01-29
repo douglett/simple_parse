@@ -5,7 +5,7 @@ TODO.txt
 	- dim assignment race condition  X
 	- assign to array accessor  X
 	- while loop  X
-	- comparison operators in expression
+	- comparison operators in expression  X
 	- if statement
 	- return statement (int)
 	- break while / continue while

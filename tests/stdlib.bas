@@ -13,7 +13,7 @@ function concat(dest, source)
 	dim ssize = sizeof(source)
 	dim i = 0
 	call realloc(dest, dsize + ssize)
-	while i
+	while i < ssize
 		dest[dsize + i] = ssize[i]
 		i = i + 1
 	end while

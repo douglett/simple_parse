@@ -2,6 +2,7 @@
 using namespace std;
 
 namespace parse {
+	Node _comp();
 	Node _term();
 	Node _prod();
 	Node _atom();
@@ -10,7 +11,7 @@ namespace parse {
 	Node _brackets();
 
 	Node expr() {
-		return { "expr", "", { _term() }};
+		return { "expr", "", { _comp() }};
 	}
 	
 	Node expr_zero() {
@@ -32,6 +33,28 @@ namespace parse {
 		input.next();
 		if    (input.peek() == "[")  return _array_index(name);
 		else  return script_get_var(name);
+	}
+
+	Node _comp() {
+		auto lhs = _term();
+		// find operator in list
+		string op;
+		int pos = input.pos;
+		for (auto opcode : vector<string>{ "==", "!=", ">=", "<=", ">", "<" }) {
+			for (char opsymbol : opcode) {  // see if the next X characters correspond to the opcode
+				if (input.peek() != string(1, opsymbol)) break;  // missing character - break
+				input.next();
+				op += opsymbol;  // add to code
+			}
+			if (op == opcode) break;  // full code found! break here
+			op = "", input.pos = pos; // not found, reset and restart
+		}
+		// if operator was found
+		if (op != "") {
+			auto rhs = _term();
+			return { "operator", op, { lhs, rhs } };
+		}
+		return lhs;
 	}
 
 	Node _term() {
@@ -115,7 +138,7 @@ namespace parse {
 	Node _brackets() {
 		if (input.peek() != "(") input.die();
 		input.next();
-		auto lhs = _term();
+		auto lhs = _comp();
 		if (input.peek() != ")") input.die();
 		input.next();
 		return { "operator", "()", { lhs } };
