@@ -155,23 +155,77 @@ namespace parse {
 		}};
 	}
 
+	// Node _stmt_if_() {
+	// 	if (input.peeklower() != "if") input.die(); // must start with if keyword
+	// 	Node stmt = { "stmt-if" };
+	// 	// loop through multiple cases
+	// 	while (true) {
+	// 		Node if_case = { "if-case" };
+	// 		// if (beginning)
+	// 		if (input.peeklower() == "if") {
+	// 			if (stmt.kids.size() > 0) input.die();
+	// 			input.next();
+	// 			if_case.value = "if";
+	// 			if_case.push( expr() );
+	// 		}
+	// 		// else-if / else
+	// 		else if (input.peeklower() == "else") {
+	// 			input.next();
+	// 			if_case.value = "else";
+	// 			if (input.peeklower() == "if") {
+	// 				input.next();
+	// 				if_case.value = "else-if";
+	// 				if_case.push( expr() );
+	// 			}
+	// 		}
+	// 		// unknown
+	// 		else  break;
+	// 		// end line
+	// 		if (!input.eol()) input.die(); // end-line
+	// 		input.nextline();
+	// 		// get the statement-block
+	// 		if_case.push( stmt_block() ); // get statement block
+	// 		stmt.push(if_case);
+	// 	}
+	// 	// make sure we have the final end-if closure
+	// 	auto endif = stmt_block_end("if");
+	// 	return stmt;
+	// }
+
 	Node _stmt_if() {
-		if (input.peeklower() != "if") input.die(); // keyword
+		if (input.peeklower() != "if") input.die(); // must start with if keyword
+		Node stmt = { "stmt-if" };
+		// first condition block
 		input.next();
 		auto condition = expr();
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
-		
 		auto block = stmt_block(); // get statement block
-
-		// if (input.peek() == "else") printf("else!!1\n");
-
+		stmt.push({ "if-case", "if", { condition, block } });
+		// else statements
+		while (input.peeklower() == "else") {
+			input.next();
+			// else-if block
+			if (input.peeklower() == "if") {
+				input.next();
+				auto condition = expr();
+				if (!input.eol()) input.die(); // end-line
+				input.nextline();
+				auto block = stmt_block(); // get statement block
+				stmt.push({ "if-case", "else-if", { condition, block } });
+			}
+			// else block
+			else {
+				if (!input.eol()) input.die(); // end-line
+				input.nextline();
+				auto block = stmt_block(); // get statement block
+				stmt.push({ "if-case", "else", { block } });
+				break; // naked else must be the final case
+			}
+		}
+		// make sure we have the final end-if closure
 		auto endif = stmt_block_end("if");
-		
-		return { "stmt-if", "", {
-			condition,
-			block
-		}};
+		return stmt;
 	}
 
 	Node _stmt_assign() {

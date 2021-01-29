@@ -17,8 +17,4 @@ function concat(dest, source)
 		dest[dsize + i] = ssize[i]
 		i = i + 1
 	end while
-	if i
-		i = 100
-	#else
-	end if
 end function

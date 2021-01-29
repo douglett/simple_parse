@@ -6,8 +6,8 @@ TODO.txt
 	- assign to array accessor  X
 	- while loop  X
 	- comparison operators in expression  X
-	- if statement
-		- else if / else
+	- if statement  X
+		- else if / else  X
 	- return statement (int)
 	- break while / continue while
 
