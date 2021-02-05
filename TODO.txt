@@ -8,7 +8,9 @@ TODO.txt
 	- comparison operators in expression  X
 	- if statement  X
 		- else if / else  X
-	- return statement (int)
+	- return statement (int)  X
+	- and / or in expression  X
+		- use '&&' or 'and'?  X
 	- break while / continue while
 
 

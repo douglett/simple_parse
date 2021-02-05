@@ -2,6 +2,8 @@
 using namespace std;
 
 namespace parse {
+	Node _or();
+	Node _and();
 	Node _comp();
 	Node _term();
 	Node _prod();
@@ -11,7 +13,7 @@ namespace parse {
 	Node _brackets();
 
 	Node expr() {
-		return { "expr", "", { _comp() }};
+		return { "expr", "", { _or() }};
 	}
 	
 	Node expr_zero() {
@@ -35,25 +37,48 @@ namespace parse {
 		else  return script_get_var(name);
 	}
 
+
+	int _getop(const string& opcode) {
+		// helper - get compound operator
+		int pos = input.pos;
+		string op;
+		for (char opsymbol : opcode) {  // see if the next X characters correspond to the opcode
+			if (input.peek() != string(1, opsymbol)) break;  // missing character - break
+			input.next();
+			op += opsymbol;  // add to code
+		}
+		if (op == opcode) return 1;  // full code found!
+		op = "", input.pos = pos; // not found, reset and restart
+		return 0;
+	}
+
+	Node _or() {
+		auto lhs = _and();
+		if (_getop("||")) {
+			auto rhs = _or();
+			return { "operator", "||", { lhs, rhs } };
+		}
+		return lhs;
+	}
+
+	Node _and() {
+		auto lhs = _comp();
+		if (_getop("&&")) {
+			auto rhs = _and();
+			return { "operator", "&&", { lhs, rhs } };
+		}
+		return lhs;
+	}
+
 	Node _comp() {
+		static const vector<string> COMP_OPERATORS = { "==", "!=", ">=", "<=", ">", "<" };
 		auto lhs = _term();
 		// find operator in list
-		string op;
-		int pos = input.pos;
-		for (auto opcode : vector<string>{ "==", "!=", ">=", "<=", ">", "<" }) {
-			for (char opsymbol : opcode) {  // see if the next X characters correspond to the opcode
-				if (input.peek() != string(1, opsymbol)) break;  // missing character - break
-				input.next();
-				op += opsymbol;  // add to code
+		for (auto opcode : COMP_OPERATORS)
+			if (_getop(opcode)) {
+				auto rhs = _comp();
+				return { "operator", opcode, { lhs, rhs } };
 			}
-			if (op == opcode) break;  // full code found! break here
-			op = "", input.pos = pos; // not found, reset and restart
-		}
-		// if operator was found
-		if (op != "") {
-			auto rhs = _term();
-			return { "operator", op, { lhs, rhs } };
-		}
 		return lhs;
 	}
 
@@ -138,7 +163,7 @@ namespace parse {
 	Node _brackets() {
 		if (input.peek() != "(") input.die();
 		input.next();
-		auto lhs = _comp();
+		auto lhs = _or();
 		if (input.peek() != ")") input.die();
 		input.next();
 		return { "operator", "()", { lhs } };
