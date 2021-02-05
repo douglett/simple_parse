@@ -5,17 +5,19 @@ namespace parse {
 	Node _stmt_print();
 	Node _stmt_input();
 	Node _stmt_call();
+	Node _stmt_return();
 	Node _stmt_while();
 	Node _stmt_if();
 	Node _stmt_assign();
 
 	Node stmt() {
-		if      (input.peeklower() == "print") return _stmt_print();
-		if      (input.peeklower() == "input") return _stmt_input();
-		else if (input.peeklower() == "call")  return _stmt_call();
-		else if (input.peeklower() == "while") return _stmt_while();
-		else if (input.peeklower() == "if")    return _stmt_if();
-		else if (input.is_identifier())        return _stmt_assign();
+		if      (input.peeklower() == "print")  return _stmt_print();
+		else if (input.peeklower() == "input")  return _stmt_input();
+		else if (input.peeklower() == "call")   return _stmt_call();
+		else if (input.peeklower() == "return") return _stmt_return();
+		else if (input.peeklower() == "while")  return _stmt_while();
+		else if (input.peeklower() == "if")     return _stmt_if();
+		else if (input.is_identifier())         return _stmt_assign();
 		else    input.die();
 		return { "??" }; // should die before here
 	}
@@ -138,6 +140,18 @@ namespace parse {
 		input.nextline();
 		return { "stmt-call", "", {
 			mycall
+		}};
+	}
+
+	Node _stmt_return() {
+		if (input.peeklower() != "return") input.die(); // return keyword
+		input.next();
+		auto myexpr = expr_zero();
+		if (!input.eol()) myexpr = expr(); // optional return expression
+		if (!input.eol()) input.die(); // expect end-line
+		input.nextline();
+		return { "stmt-return", "", {
+			myexpr
 		}};
 	}
 
