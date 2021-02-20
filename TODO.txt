@@ -1,5 +1,14 @@
 TODO.txt
 
+:: Feb 2021 ::
+	- basic runtime for text adventure!
+	- break while / continue while
+	- basic types (int, float, string)
+	- array type
+		- array of basic type
+	- type definitions (struct)
+
+
 :: Jan pt2 2021 ::
 	- multiple input files  X
 	- dim assignment race condition  X
@@ -11,7 +20,6 @@ TODO.txt
 	- return statement (int)  X
 	- and / or in expression  X
 		- use '&&' or 'and'?  X
-	- break while / continue while
 
 
 :: Jan 2021 ::

@@ -1,6 +1,6 @@
 # my first hello world program!
 
-#system function malloc(size)
+system function malloc(size)
 
 function main()
 	call hello1()
@@ -13,6 +13,6 @@ end function
 
 function hello2()
 	dim name = malloc(1)
-	input "What is your name?", name
+	input "What is your name? ", name
 	print "Hello, ", name
 end function

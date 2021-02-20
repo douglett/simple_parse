@@ -9,7 +9,7 @@ dim CMD_WEST 	= malloc(1)
 
 function main()
 	call init()
-	call room_1()
+	#call room_1()
 end function
 
 function init()
@@ -46,4 +46,5 @@ function room_1()
 		end if
 	end while
 
+	call free(cmd)
 end function

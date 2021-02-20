@@ -7,12 +7,25 @@ struct Node {
 	std::string type, value;
 	std::vector<Node> kids;
 
+	// const accessors
+	int count(const string& type) const {
+		int c = 0;
+		if (type == "") return 0;
+		for (auto& n : kids)
+			if (n.type == type) c++;
+		return c;
+	}
+	const Node& at(const string& type, const string& value="") const {
+		return ((Node*)this)->at(type);
+	}
+
 	// mutators
-	Node& at(const string& type) {
+	Node& at(const string& type, const string& value="") {
 		if (type == "") fprintf(stderr, "error: empty node key type\n"), exit(1);
 		for (auto& n : kids)
-			if (n.type == type) return n;
-		fprintf(stderr, "error: missing in node list: %s\n", type.c_str()), exit(1);
+			if      (n.type == type && value == "") return n;
+			else if (n.type == type && n.value == value) return n;
+		fprintf(stderr, "error: missing in node list: %s:%s\n", type.c_str(), value.c_str()), exit(1);
 	}
 	Node& push(const Node& n) {
 		kids.push_back(n);
