@@ -1,12 +1,9 @@
-dim g1 = 1
+dim str = malloc(1)
 
 function main()
-	print "test: ", g1
-	call t2()
-	print "test 3: ", g1
-end function
-
-function t2()
-	dim g1 = 2
-	print "test 2: ", g1
+	prints str, "butt ", 4
+	print "test 1: ", str
+	print "test 2: ", $str
+	input "why? ", str
+	print "test 3: [", $str, "]"
 end function

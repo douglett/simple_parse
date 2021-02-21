@@ -9,21 +9,15 @@ dim CMD_WEST 	= malloc(1)
 
 function main()
 	call init()
-	#call room_1()
+	call room_1()
 end function
 
 function init()
-	call ioredirect(0, CMD_LOOK)
-	print "look"
-	call ioredirect(0, CMD_NORTH)
-	print "north"
-	call ioredirect(0, CMD_SOUTH)
-	print "south"
-	call ioredirect(0, CMD_EAST)
-	print "east"
-	call ioredirect(0, CMD_WEST)
-	print "west"
-	call ioredirect(0, 0)
+	prints CMD_LOOK, "look"
+	prints CMD_NORTH, "north"
+	prints CMD_SOUTH, "south"
+	prints CMD_EAST, "east"
+	prints CMD_WEST, "west"
 end function
 
 function room_1()

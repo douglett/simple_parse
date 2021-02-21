@@ -5,7 +5,7 @@ system function malloc(size)
 system function sizeof(pointer)
 system function realloc(pointer, size)
 system function free(pointer)
-system function ioredirect(iotype, pointer)
+#system function ioredirect(iotype, pointer)
 
 # arrays and strings
 function arconcat(dest, source)

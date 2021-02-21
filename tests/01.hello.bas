@@ -14,5 +14,5 @@ end function
 function hello2()
 	dim name = malloc(1)
 	input "What is your name? ", name
-	print "Hello, ", name
+	print "Hello, ", $name
 end function

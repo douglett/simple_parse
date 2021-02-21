@@ -3,6 +3,8 @@ using namespace std;
 
 namespace parse {
 	Node _stmt_print();
+	Node _stmt_print_string();
+	Node __print_list();
 	Node _stmt_input();
 	Node _stmt_call();
 	Node _stmt_return();
@@ -12,6 +14,7 @@ namespace parse {
 
 	Node stmt() {
 		if      (input.peeklower() == "print")  return _stmt_print();
+		else if (input.peeklower() == "prints") return _stmt_print_string();
 		else if (input.peeklower() == "input")  return _stmt_input();
 		else if (input.peeklower() == "call")   return _stmt_call();
 		else if (input.peeklower() == "return") return _stmt_return();
@@ -88,16 +91,34 @@ namespace parse {
 		input.nextline();
 		// just return Node for consistency
 		return { "stmt-block-end", blocktype };
-	} 
+	}
 
 	Node _stmt_print() {
 		Node stmt = { "stmt-print" };
 		if (input.peeklower() != "print") input.die();
 		input.next();
-		int list_empty = input.eol(); // print can have no arguments (empty line)
-		while (!list_empty) {
+		if (!input.eol()) stmt.push( __print_list() ); // print can have no arguments (empty line)
+		return stmt;
+	}
+
+	Node _stmt_print_string() {
+		Node stmt = { "stmt-print-string" };
+		if (input.peeklower() != "prints") input.die();
+		input.next();
+		auto var = expr_assignable(); // get assignment location (non-optional)
+		if (input.peek() != ",") input.die();
+		input.next();
+		stmt.push({ "target", "", { var } }); // add assignment target
+		stmt.push( __print_list() ); // add list (must have 1+ paramaters)
+		return stmt;
+	}
+
+	Node __print_list() {
+		Node stmt = { "list" };
+		while (true) {
 			// list contents
 			if      (input.is_strlit()) stmt.push({ "string-literal", input.peek() }), input.next(); // literal
+			else if (input.peek() == "$") input.next(), stmt.push({ "$", "", { expr_assignable() } }); // string pointer
 			else    stmt.push( expr() ); // should be expression
 			// next list item
 			if      (input.eol()) break; // list end
