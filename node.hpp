@@ -18,6 +18,9 @@ struct Node {
 	const Node& at(const string& type, const string& value="") const {
 		return ((Node*)this)->at(type);
 	}
+	const Node& at(int index) const {
+		return ((Node*)this)->at(index);
+	}
 
 	// mutators
 	Node& at(const string& type, const string& value="") {
@@ -26,6 +29,13 @@ struct Node {
 			if      (n.type == type && value == "") return n;
 			else if (n.type == type && n.value == value) return n;
 		fprintf(stderr, "error: missing in node list: %s:%s\n", type.c_str(), value.c_str());
+		show();
+		exit(1);
+	}
+	Node& at(int index) {
+		if (index >= 0 && index < kids.size())
+			return kids[index];
+		fprintf(stderr, "error: index out of range: %d\n", index);
 		show();
 		exit(1);
 	}

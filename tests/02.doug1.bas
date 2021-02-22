@@ -32,11 +32,11 @@ function room_1()
 		if arcompare(cmd, CMD_LOOK)
 			print "The room is dark. There are exits north, south, east, west."
 		else if arcompare(cmd, CMD_NORTH) || arcompare(cmd, CMD_SOUTH)
-			print "You walk ", cmd, "."
+			print "You walk ", $cmd, "."
 			print "You die."
 			return
 		else
-			print "Unknown command: [", cmd, "]"
+			print "Unknown command: [", $cmd, "]"
 		end if
 	end while
 

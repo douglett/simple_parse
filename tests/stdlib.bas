@@ -29,6 +29,7 @@ function arcompare(a1, a2)
 		if a1[i] != a2[i]
 			return 0
 		end if
+		i = i + 1
 	end while
 	return 1
 end function
