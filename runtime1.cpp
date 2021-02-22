@@ -15,6 +15,7 @@ namespace runtime1 {
 	i32 _stmt_block(const Node& myblock);
 	i32 _stmt(const Node& mystmt);
 	i32 _expr(const Node& expr);
+	i32 _die(const string& msg, const Node& n);
 	string _string_ptr(i32 ptr);
 	i32 _stack_val(const Node& var);
 	i32 _stack_deref(const Node& var);
@@ -59,8 +60,7 @@ namespace runtime1 {
 			return heap.size()-1;
 		} 
 		// missing syscall
-		fprintf(stderr, "unknown system call: %s:%d\n", name.c_str(), args.size());
-		exit(1);
+		return _die("unknown system call: "+name+":"+to_string(args.size()), {});
 	}
 
 
@@ -69,13 +69,13 @@ namespace runtime1 {
 
 	i32 _dim(const Node& mydim, int local) {
 		auto name = (local ? "~" : "") + mydim.value;
-		if (stack.count(name) != 0)
-			fprintf(stderr, "error: redim: %s\n", name.c_str()), exit(1);
+		if (stack.count(name) != 0)  _die("redim error", mydim);
 		stack[name] = _expr( mydim.at("expr") );
 		return 0;
 	}
 
 	i32 _stmt_block(const Node& myblock) {
+		if (myblock.type != "stmt-block") _die("expected block", myblock);
 		for (auto& st : myblock.kids)
 			_stmt(st);
 		return 0;
@@ -85,17 +85,19 @@ namespace runtime1 {
 		if (mystmt.type == "stmt-call") {
 			return call( mystmt.at("function-call").at("name").value, {} );
 		}
+
 		else if (mystmt.type == "stmt-print" || mystmt.type == "stmt-print-string") {
 			string str;
 			for (auto &var : mystmt.at("list").kids)
 				if      (var.type == "string-literal")  str += InputFile::escape_strlit( var.value );
-				else if (var.type == "$")  str += _string_ptr( _expr(var.kids[0]) );
-				else if (var.type == "expr")  str += to_string( _expr(var) );
-				else    fprintf(stderr, "stmt-print error: %s\n", var.type.c_str()), mystmt.show(), exit(1);
+				else if (var.type == "$")               str += _string_ptr( _expr(var.kids[0]) );
+				else if (var.type == "expr")            str += to_string( _expr(var) );
+				else    _die("unexpected in print", var);
 			if    (mystmt.type == "stmt-print")  printf("%s\n", str.c_str()); // dump to console
 			else  _assign_string( mystmt.at("target").kids[0], str ); // print into a memory string
 			return 0;
 		}
+
 		else if (mystmt.type == "stmt-input") {
 			// mystmt.show();
 			printf("%s", InputFile::escape_strlit( mystmt.at("prompt").value ).c_str()); // input prompt
@@ -105,10 +107,22 @@ namespace runtime1 {
 			_assign_string( dst, input ); // dump into a memory string
 			return 0;
 		}
+
+		else if (mystmt.type == "stmt-while") {
+			while ( _expr(mystmt.at("expr")) )
+				_stmt_block( mystmt.at("stmt-block") );
+		}
+		
+		else if (mystmt.type == "stmt-if") {
+			for (auto& ifcase : mystmt.kids)
+				if      (ifcase.type  != "if-case")  _die("ifcase error", ifcase);
+				else if (ifcase.value == "else-if")  {  if (_expr(ifcase.at("expr")))  return _stmt_block(ifcase.at("stmt-block"));  }
+				else if (ifcase.value == "else")     return _stmt_block(ifcase.at("stmt-block"));
+			return 0;  // no match
+		}
+
 		// missing type
-		fprintf(stderr, "unknown statement type: %s\n", mystmt.type.c_str());
-		mystmt.show();
-		exit(1);
+		return _die("unknown statement type", mystmt);
 	}
 
 
@@ -126,44 +140,49 @@ namespace runtime1 {
 				args.push_back( _expr(arg) );
 			return call( expr.at("name").value, args );
 		}
-		// error
-		fprintf(stderr, "unknown expr type: %s\n", expr.type.c_str());
-		expr.show();
-		exit(1);
+		if (expr.type == "operator") {
+			if (expr.value == "||")  return _expr(expr.kids[0]) || _expr(expr.kids[1]);
+		}
+		return _die("unknown expr type", expr); // error
 	}
 
 
 
 	// helpers
 
+	i32 _die(const string& msg, const Node& n) {
+		fprintf(stdout, "error: %s\n", msg.c_str());
+		n.show();
+		exit(1);
+		return 0;
+	}
+
 	string _string_ptr(i32 ptr) {
 		string str;
 		auto& mem = heap[ptr];
 		for (auto v : mem)
-			str += char(v);
+			if (v == 0)  break;
+			else  str += char(v);
 		return str;
 	}
 
 	i32 _stack_val(const Node& var) {
-		auto name = var.value;
-		if (var.type == "var-local") name = "~"+name;
-		if (stack.count(name) == 0)
-			fprintf(stderr, "undefined variable: %s\n", name.c_str()), exit(1);
+		auto name = (var.type == "var-local" ? "~" : "") + var.value;
+		if (stack.count(name) == 0)   _die("undefined variable", var);
 		return stack[name];
 	}
 
 	i32 _stack_deref(const Node& var) {
 		int loc = _stack_val(var);
-		if (loc <= 0 || loc >= heap.size())
-			fprintf(stderr, "deref error\n"), exit(1);
+		if (loc <= 0 || loc >= heap.size())  _die("deref error", var);
 		return loc;
 	}
 
 	void _assign_string(const Node& var, const string& str) {
 		int loc = _stack_deref(var);
 		heap[loc] = {};
-		for (auto c : str) heap[loc].push_back(c);
-		if (str.length() == 0) heap[loc].push_back(0);  // make sure it isn't totally empty, until free() called
+		for (auto c : str)  heap[loc].push_back(c);
+		if (str.length() == 0)  heap[loc].push_back(0);  // make sure it isn't totally empty, until free() called
 	}
 
 }

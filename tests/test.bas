@@ -1,3 +1,5 @@
+system function malloc(size)
+
 dim str = malloc(1)
 
 function main()
@@ -6,4 +8,10 @@ function main()
 	print "test 2: ", $str
 	input "why? ", str
 	print "test 3: [", $str, "]"
+
+	call testy(123)
+end function
+
+function testy(val)
+	print "val: ", val
 end function

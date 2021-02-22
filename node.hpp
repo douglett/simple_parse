@@ -25,7 +25,9 @@ struct Node {
 		for (auto& n : kids)
 			if      (n.type == type && value == "") return n;
 			else if (n.type == type && n.value == value) return n;
-		fprintf(stderr, "error: missing in node list: %s:%s\n", type.c_str(), value.c_str()), exit(1);
+		fprintf(stderr, "error: missing in node list: %s:%s\n", type.c_str(), value.c_str());
+		show();
+		exit(1);
 	}
 	Node& push(const Node& n) {
 		kids.push_back(n);
