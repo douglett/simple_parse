@@ -148,7 +148,7 @@ namespace parse {
 		input.nextline();
 		return { "stmt-input", "", {
 			{ "prompt", prompt },
-			var
+			{ "target", "", { var } }
 		}};
 	}
 

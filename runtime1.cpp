@@ -18,11 +18,9 @@ namespace runtime1 {
 	i32 _stmt(const Node& mystmt);
 	i32 _expr(const Node& expr);
 	i32 _die(const string& msg, const Node& n);
-	string _string_ptr(i32 ptr);
-	i32 _stack_val(const Node& var);
-	i32 _heap_check(i32 ptr);
-	i32 _stack_deref(const Node& var);
-	void _assign_string(const Node& var, const string& str);
+	string _ptr_to_string(i32 ptr);
+	i32 _string_to_ptr(const string& str, i32 ptr);
+	i32 _stack_get(const Node& var);
 
 
 
@@ -46,14 +44,6 @@ namespace runtime1 {
 	// call
 
 	i32 _fncall(const Node& function, const vector<i32>& args) {
-		// printf("fncall: %s %d\n", function.value.c_str(), args.size());
-		// function.show();
-		// auto& argsdec = function.at("function-declaration").at("arguments");
-		// argsdec.show();
-
-		// for (auto a : args)
-		// 	printf("   arg: %d\n", a);
-
 		auto& locals = function.at("locals");
 		for (auto& local : locals.kids)
 			if      (local.type == "dim" && local.count("argument"))  _dim_arg(local, args);
@@ -68,8 +58,10 @@ namespace runtime1 {
 			return heap.size()-1;
 		} 
 		else if (name == "sizeof" && args.size() == 1) {
-			int loc = _heap_check(args[0]);
-			return heap[loc].size();
+			// i32 ptr = args[0];
+			// if (ptr < 0 || ptr >= heap.size()) _die("bad pointer", {});
+			// return heap[ptr].size();
+			return heap[args[0]].size();
 		}
 		// missing syscall
 		return _die("unknown system call: " + name + " (argc: " + to_string(args.size()) + ")", {});
@@ -117,21 +109,19 @@ namespace runtime1 {
 			string str;
 			for (auto &var : mystmt.at("list").kids)
 				if      (var.type == "string-literal")  str += InputFile::escape_strlit( var.value );
-				else if (var.type == "$")               str += _string_ptr( _expr(var.at(0)) );
+				else if (var.type == "$")               str += _ptr_to_string( _expr(var.at(0)) );
 				else if (var.type == "expr")            str += to_string( _expr(var) );
 				else    _die("unexpected in print", var);
 			if    (mystmt.type == "stmt-print")  printf("%s\n", str.c_str()); // dump to console
-			else  _assign_string( mystmt.at("target").at(0), str ); // print into a memory string
+			else  _string_to_ptr( str, _stack_get(mystmt.at("target").at(0)) ); // print into a memory string
 			return 0;
 		}
 
 		else if (mystmt.type == "stmt-input") {
-			// mystmt.show();
 			printf("%s", InputFile::escape_strlit( mystmt.at("prompt").value ).c_str()); // input prompt
 			string input;
 			getline(cin, input); // get input
-			auto dst = mystmt.count("var-local") ? mystmt.at("var-local") : mystmt.at("var-global"); // find input target
-			_assign_string( dst, input ); // dump into a memory string
+			_string_to_ptr( input, _stack_get(mystmt.at("target").at(0)) ); // print into a memory string
 			return 0;
 		}
 
@@ -147,8 +137,9 @@ namespace runtime1 {
 		else if (mystmt.type == "stmt-if") {
 			for (auto& ifcase : mystmt.kids)
 				if      (ifcase.type  != "if-case")  _die("ifcase error", ifcase);
-				else if (ifcase.value == "else-if")  {  if (_expr(ifcase.at("expr")))  return _stmt_block(ifcase.at("stmt-block"));  }
-				else if (ifcase.value == "else")     return _stmt_block(ifcase.at("stmt-block"));
+				else if (ifcase.value == "if"      && _expr(ifcase.at("expr")) )  return _stmt_block(ifcase.at("stmt-block"));
+				else if (ifcase.value == "else-if" && _expr(ifcase.at("expr")) )  return _stmt_block(ifcase.at("stmt-block"));
+				else if (ifcase.value == "else")                                  return _stmt_block(ifcase.at("stmt-block"));
 			return 0;  // no match (ok)
 		}
 
@@ -156,11 +147,13 @@ namespace runtime1 {
 			i32 val = _expr(mystmt.at("expr"));
 			if      (mystmt.count("var-global"))  return stack[mystmt.at("var-global").value] = val;
 			else if (mystmt.count("var-local"))   return stack["~"+mystmt.at("var-local").value] = val;
+			// TODO: heap array
 		}
 
 		else if (mystmt.type == "stmt-return") {
+			auto result = _expr(mystmt.at("expr"));
 			return_flag = 1;
-			return _expr(mystmt.at("expr"));
+			return result;
 		}
 
 		// missing type
@@ -174,8 +167,13 @@ namespace runtime1 {
 	i32 _expr(const Node& expr) {
 		if      (expr.type == "expr")        return _expr(expr.at(0));
 		else if (expr.type == "number")      return stoi(expr.value);
-		else if (expr.type == "var-local")   return _stack_val(expr);
-		else if (expr.type == "var-global")  return _stack_val(expr);
+		else if (expr.type == "var-local")   return _stack_get(expr);
+		else if (expr.type == "var-global")  return _stack_get(expr);
+		else if (expr.type == "array-access") {
+			i32 ptr = _stack_get( expr.at("target").at(0) );
+			i32 offset = _expr( expr.at("expr") );
+			return heap[ptr][offset]; // TODO: range checking
+		}
 		else if (expr.type == "function-call") {
 			vector<i32> args;
 			for (auto& arg : expr.at("arguments").kids)
@@ -183,9 +181,11 @@ namespace runtime1 {
 			return call( expr.at("name").value, args );
 		}
 		else if (expr.type == "operator") {
-			if      (expr.value == "||")  return _expr(expr.at(0)) || _expr(expr.at(1));
+			if      (expr.value == "+" )  return _expr(expr.at(0)) +  _expr(expr.at(1));
+			else if (expr.value == "*" )  return _expr(expr.at(0)) *  _expr(expr.at(1));
+			else if (expr.value == "||")  return _expr(expr.at(0)) || _expr(expr.at(1));
+			else if (expr.value == "!=")  return _expr(expr.at(0)) != _expr(expr.at(1));
 			else if (expr.value == "<" )  return _expr(expr.at(0)) <  _expr(expr.at(1));
-			else if (expr.value == "+" )  return _expr(expr.at(0)) +  _expr(expr.at(1));
 		}
 		return _die("unknown expr type", expr); // error
 	}
@@ -201,7 +201,7 @@ namespace runtime1 {
 		return 0;
 	}
 
-	string _string_ptr(i32 ptr) {
+	string _ptr_to_string(i32 ptr) {
 		string str;
 		auto& mem = heap[ptr];
 		for (auto v : mem)
@@ -210,28 +210,23 @@ namespace runtime1 {
 		return str;
 	}
 
-	i32 _stack_val(const Node& var) {
+	i32 _string_to_ptr(const string& str, i32 ptr) {
+		auto& mem = heap[ptr];
+		mem = {};
+		for (auto c : str)
+			mem.push_back(c);
+		if (mem.size() == 0)  mem.push_back(0); // make sure it isn't totally empty, until free() called
+		return ptr;
+	}
+
+	i32 _stack_get(const Node& var) {
 		auto name = (var.type == "var-local" ? "~" : "") + var.value;
 		if (stack.count(name) == 0)   _die("undefined variable", var);
 		return stack[name];
 	}
 
-	i32 _heap_check(i32 ptr) {
-		if (ptr <= 0 || ptr >= heap.size())  _die("deref error at: "+to_string(ptr), {});
-		return ptr;
-	}
-
-	i32 _stack_deref(const Node& var) {
-		int loc = _stack_val(var);
-		if (loc <= 0 || loc >= heap.size())  _die("deref error", var);
-		return loc;
-	}
-
-	void _assign_string(const Node& var, const string& str) {
-		int loc = _stack_deref(var);
-		heap[loc] = {};
-		for (auto c : str)  heap[loc].push_back(c);
-		if (str.length() == 0)  heap[loc].push_back(0);  // make sure it isn't totally empty, until free() called
-	}
+	// vector<i32>& _heap_get(i32 ptr) {
+		
+	// }
 
 }

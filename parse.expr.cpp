@@ -155,7 +155,7 @@ namespace parse {
 		if (input.peek() != "]") input.die(); 
 		input.next();
 		return { "array-access", "", {
-			var,
+			{ "target", "", { var } },
 			addr
 		}};
 	}

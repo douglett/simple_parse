@@ -1,17 +1,18 @@
-system function malloc(size)
+#system function malloc(size)
 
 dim str = malloc(1)
+dim str2 = malloc(1)
 
 function main()
-	prints str, "butt ", 4
-	print "test 1: ", str
-	print "test 2: ", $str
-	input "why? ", str
-	print "test 3: [", $str, "]"
-
-	call testy(123)
+	prints str,  "test1"
+	prints str2, "test1"
+	print "result: ", arcompare(str, str2)
 end function
 
 function testy(val)
-	print "val: ", val
+	if val < 10
+		return val * 2
+	else
+		return val * 3
+	end if
 end function
