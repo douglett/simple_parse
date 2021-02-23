@@ -187,10 +187,17 @@ namespace runtime1 {
 		}
 		else if (expr.type == "operator") {
 			if      (expr.value == "+" )  return _expr(expr.at(0)) +  _expr(expr.at(1));
+			else if (expr.value == "-" )  return _expr(expr.at(0)) -  _expr(expr.at(1));
 			else if (expr.value == "*" )  return _expr(expr.at(0)) *  _expr(expr.at(1));
-			else if (expr.value == "||")  return _expr(expr.at(0)) || _expr(expr.at(1));
+			else if (expr.value == "/" )  return _expr(expr.at(0)) /  _expr(expr.at(1));
+			else if (expr.value == "==")  return _expr(expr.at(0)) == _expr(expr.at(1));
 			else if (expr.value == "!=")  return _expr(expr.at(0)) != _expr(expr.at(1));
 			else if (expr.value == "<" )  return _expr(expr.at(0)) <  _expr(expr.at(1));
+			else if (expr.value == "<=")  return _expr(expr.at(0)) <= _expr(expr.at(1));
+			else if (expr.value == ">" )  return _expr(expr.at(0)) >  _expr(expr.at(1));
+			else if (expr.value == ">=")  return _expr(expr.at(0)) >= _expr(expr.at(1));
+			else if (expr.value == "&&")  return _expr(expr.at(0)) && _expr(expr.at(1));
+			else if (expr.value == "||")  return _expr(expr.at(0)) || _expr(expr.at(1));
 		}
 		return _die("unknown expr type", expr); // error
 	}
