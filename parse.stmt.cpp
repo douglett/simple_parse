@@ -190,43 +190,6 @@ namespace parse {
 		}};
 	}
 
-	// Node _stmt_if_() {
-	// 	if (input.peeklower() != "if") input.die(); // must start with if keyword
-	// 	Node stmt = { "stmt-if" };
-	// 	// loop through multiple cases
-	// 	while (true) {
-	// 		Node if_case = { "if-case" };
-	// 		// if (beginning)
-	// 		if (input.peeklower() == "if") {
-	// 			if (stmt.kids.size() > 0) input.die();
-	// 			input.next();
-	// 			if_case.value = "if";
-	// 			if_case.push( expr() );
-	// 		}
-	// 		// else-if / else
-	// 		else if (input.peeklower() == "else") {
-	// 			input.next();
-	// 			if_case.value = "else";
-	// 			if (input.peeklower() == "if") {
-	// 				input.next();
-	// 				if_case.value = "else-if";
-	// 				if_case.push( expr() );
-	// 			}
-	// 		}
-	// 		// unknown
-	// 		else  break;
-	// 		// end line
-	// 		if (!input.eol()) input.die(); // end-line
-	// 		input.nextline();
-	// 		// get the statement-block
-	// 		if_case.push( stmt_block() ); // get statement block
-	// 		stmt.push(if_case);
-	// 	}
-	// 	// make sure we have the final end-if closure
-	// 	auto endif = stmt_block_end("if");
-	// 	return stmt;
-	// }
-
 	Node _stmt_if() {
 		if (input.peeklower() != "if") input.die(); // must start with if keyword
 		Node stmt = { "stmt-if" };
@@ -273,7 +236,7 @@ namespace parse {
 		if (!input.eol()) input.die(); // end-line
 		input.nextline();
 		return { "stmt-assign", "", {
-			var,
+			{ "target", "", { var } },
 			myexpr
 		}};
 	}

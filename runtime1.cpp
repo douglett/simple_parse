@@ -14,10 +14,12 @@ namespace runtime1 {
 	i32 _fncall(const Node& function, const vector<i32>& args);
 	i32 _dim(const Node& mydim, int local);
 	i32 _dim_arg(const Node& mydim, const vector<i32>& args);
+	i32 _undim(const Node& mydim, int local);
 	i32 _stmt_block(const Node& myblock);
 	i32 _stmt(const Node& mystmt);
 	i32 _expr(const Node& expr);
 	i32 _die(const string& msg, const Node& n);
+	vector<i32>& _heap_base(i32 ptr);
 	string _ptr_to_string(i32 ptr);
 	i32 _string_to_ptr(const string& str, i32 ptr);
 	i32 _stack_get(const Node& var);
@@ -45,11 +47,13 @@ namespace runtime1 {
 
 	i32 _fncall(const Node& function, const vector<i32>& args) {
 		auto& locals = function.at("locals");
-		for (auto& local : locals.kids)
+		for (auto& local : locals.kids)  // define everything
 			if      (local.type == "dim" && local.count("argument"))  _dim_arg(local, args);
 			else if (local.type == "dim")  _dim(local, true);
-		i32 val = _stmt_block( function.at("stmt-block") );
-		return return_flag = 0, val;
+		i32 val = _stmt_block( function.at("stmt-block") );  // run function statements
+		for (auto& local : locals.kids)  // undefine everything
+			if      (local.type == "dim")  _undim(local, true);
+		return return_flag = 0, val;  // return the return value
 	}
 
 	i32 _syscall(const string& name, const vector<i32>& args) {
@@ -58,10 +62,7 @@ namespace runtime1 {
 			return heap.size()-1;
 		} 
 		else if (name == "sizeof" && args.size() == 1) {
-			// i32 ptr = args[0];
-			// if (ptr < 0 || ptr >= heap.size()) _die("bad pointer", {});
-			// return heap[ptr].size();
-			return heap[args[0]].size();
+			return _heap_base(args[0]).size();
 		}
 		// missing syscall
 		return _die("unknown system call: " + name + " (argc: " + to_string(args.size()) + ")", {});
@@ -84,6 +85,13 @@ namespace runtime1 {
 		if (stack.count(name) != 0)  _die("redim error", mydim); // redim check
 		if (argloc < 0 || argloc >= args.size())  _die("arg count error", mydim);
 		stack[name] = args[argloc];
+		return 0;
+	}
+	
+	i32 _undim(const Node& mydim, int local) {
+		auto name = (local ? "~" : "") + mydim.value;
+		if (stack.count(name) == 0)  _die("undim error", mydim); // probably pointless
+		stack.erase(name);
 		return 0;
 	}
 
@@ -113,7 +121,7 @@ namespace runtime1 {
 				else if (var.type == "expr")            str += to_string( _expr(var) );
 				else    _die("unexpected in print", var);
 			if    (mystmt.type == "stmt-print")  printf("%s\n", str.c_str()); // dump to console
-			else  _string_to_ptr( str, _stack_get(mystmt.at("target").at(0)) ); // print into a memory string
+			else  _string_to_ptr( str, _stack_get(mystmt.at("target")) ); // print into a memory string
 			return 0;
 		}
 
@@ -121,13 +129,13 @@ namespace runtime1 {
 			printf("%s", InputFile::escape_strlit( mystmt.at("prompt").value ).c_str()); // input prompt
 			string input;
 			getline(cin, input); // get input
-			_string_to_ptr( input, _stack_get(mystmt.at("target").at(0)) ); // print into a memory string
+			_string_to_ptr( input, _stack_get(mystmt.at("target")) ); // print into a memory string
 			return 0;
 		}
 
 		else if (mystmt.type == "stmt-while") {
 			while ( _expr(mystmt.at("expr")) ) {
-				printf("while::\n");
+				// printf("while::\n");
 				i32 val = _stmt_block( mystmt.at("stmt-block") );
 				if (return_flag) return val;
 			}
@@ -145,8 +153,9 @@ namespace runtime1 {
 
 		else if (mystmt.type == "stmt-assign") {
 			i32 val = _expr(mystmt.at("expr"));
-			if      (mystmt.count("var-global"))  return stack[mystmt.at("var-global").value] = val;
-			else if (mystmt.count("var-local"))   return stack["~"+mystmt.at("var-local").value] = val;
+			auto& target = mystmt.at("target").at(0);
+			if      (target.type == "var-global")  return stack[target.value] = val;
+			else if (target.type == "var-local" )  return stack["~"+target.value] = val;
 			// TODO: heap array
 		}
 
@@ -165,15 +174,11 @@ namespace runtime1 {
 	// expressions
 
 	i32 _expr(const Node& expr) {
-		if      (expr.type == "expr")        return _expr(expr.at(0));
-		else if (expr.type == "number")      return stoi(expr.value);
-		else if (expr.type == "var-local")   return _stack_get(expr);
-		else if (expr.type == "var-global")  return _stack_get(expr);
-		else if (expr.type == "array-access") {
-			i32 ptr = _stack_get( expr.at("target").at(0) );
-			i32 offset = _expr( expr.at("expr") );
-			return heap[ptr][offset]; // TODO: range checking
-		}
+		if      (expr.type == "expr")          return _expr(expr.at(0));
+		else if (expr.type == "number")        return stoi(expr.value);
+		else if (expr.type == "var-local")     return _stack_get(expr);
+		else if (expr.type == "var-global")    return _stack_get(expr);
+		else if (expr.type == "array-access")  return _stack_get(expr);
 		else if (expr.type == "function-call") {
 			vector<i32> args;
 			for (auto& arg : expr.at("arguments").kids)
@@ -201,9 +206,14 @@ namespace runtime1 {
 		return 0;
 	}
 
+	vector<i32>& _heap_base(i32 ptr) {
+		if (ptr <= 0 || ptr >= heap.size())  _die("bad heap pointer: "+to_string(ptr), {});
+		return heap[ptr];
+	}
+
 	string _ptr_to_string(i32 ptr) {
 		string str;
-		auto& mem = heap[ptr];
+		auto& mem = _heap_base(ptr);
 		for (auto v : mem)
 			if (v == 0)  break;
 			else  str += char(v);
@@ -211,7 +221,7 @@ namespace runtime1 {
 	}
 
 	i32 _string_to_ptr(const string& str, i32 ptr) {
-		auto& mem = heap[ptr];
+		auto& mem = _heap_base(ptr);
 		mem = {};
 		for (auto c : str)
 			mem.push_back(c);
@@ -219,14 +229,24 @@ namespace runtime1 {
 		return ptr;
 	}
 
-	i32 _stack_get(const Node& var) {
-		auto name = (var.type == "var-local" ? "~" : "") + var.value;
-		if (stack.count(name) == 0)   _die("undefined variable", var);
-		return stack[name];
+	i32 _stack_get(const Node& target) {
+		if (target.type == "target")
+			return _stack_get( target.at(0) ); // common structure
+		else if (target.type == "var-global") {
+			if (stack.count(target.value) == 0)  _die("undefined variable", target);
+			return stack[target.value];
+		}
+		else if (target.type == "var-local") {
+			if (stack.count("~"+target.value) == 0)  _die("undefined variable", target);
+			return stack["~"+target.value];
+		}
+		else if (target.type == "array-access") {
+			i32 ptr    = _stack_get( target.at("target") ); // heap pointer location
+			i32 offset = _expr( target.at("expr") ); // offset location
+			auto& mem = _heap_base(ptr);
+			if (offset < 0 || offset > mem.size())  _die("array range check error", target); // range check
+			return mem[offset];
+		}
+		return _die("cannot get value from unknown target", target);
 	}
-
-	// vector<i32>& _heap_get(i32 ptr) {
-		
-	// }
-
 }
