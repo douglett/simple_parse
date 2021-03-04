@@ -1,12 +1,24 @@
 TODO.txt
 
+:: Mar 2021 ::
+	- implement int arrays
+		- add typeing to dims
+		- array pointers in function calls
+		- limit array subscript to arrays
+		- remove malloc/free system calls
+		- implement string as int-array synonym
+
+
 :: Feb 2021 ::
 	- basic runtime for text adventure!
-	- break while / continue while
-	- basic types (int, float, string)
-	- array type
-		- array of basic type
-	- type definitions (struct)
+		- lots to do here!
+		- add some endings for each direction!
+	- TODO next month:
+		- break while / continue while
+		- basic types (int, float, string)
+		- array type
+			- array of basic type
+		- type definitions (struct)
 
 
 :: Jan pt2 2021 ::

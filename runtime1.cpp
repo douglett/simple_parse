@@ -61,6 +61,11 @@ namespace runtime1 {
 			heap.push_back( vector<i32>(args[0], 0) );
 			return heap.size()-1;
 		} 
+		else if (name == "free" && args.size() == 1) {
+			_heap_base(args[0]) = {}; // resize to 0 (deleted)
+			// TODO: memory cleanup here
+			return 0;
+		}
 		else if (name == "sizeof" && args.size() == 1) {
 			return _heap_base(args[0]).size();
 		}
