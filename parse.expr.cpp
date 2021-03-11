@@ -158,7 +158,7 @@ namespace parse {
 
 	Node _integer(const string& name) {
 		auto dim = script_get_dim(name);
-		if (dim.at("type").value != "int")      input.die("expected variable");
+		if (dim.at("type").value != "int")  input.die("expected integer");
 		return _scoped_get(name);
 	}
 
