@@ -27,17 +27,24 @@ namespace parse {
 		if (input.load(fname)) exit(1);
 		// parse
 		_script_hoist(); // hoist-funcs
-		decls.show();
+		// decls.show();
 		_script_system(); // clear system funcs
 		_script_globals();
-		globals.show();
+		// globals.show();
 		_script_funcs();
-		funcs.show();
+		// funcs.show();
 		if (!input.eof()) input.die("expected EOF");
 		return 0;
 	}
+
+	int show() {
+		decls.show();
+		globals.show();
+		funcs.show();
+		return 0;
+	}
 	
-	Node script_get_var(const std::string& name) {
+	Node script_get_dim(const std::string& name) {
 		// return the named variable, with scoping definition
 		for (const auto& l : locals.kids)
 			if (l.value == name) return { "var-local", name };
@@ -78,7 +85,7 @@ namespace parse {
 		// parse all dims
 		while (!input.eof())
 			if       (input.eol()) input.nextline(); // skip empty lines
-			else if  (input.peeklower() == "dim") globals.push(stmt_dim()); // make dim
+			else if  (input.peeklower() == "dim") globals.push(stmt_dim(false)); // make dim
 			else     break; // end of dims
 		// check for duplicate globals variables
 		check_dup_values(globals, "globals");

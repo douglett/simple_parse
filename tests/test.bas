@@ -1,4 +1,5 @@
-#system function malloc(size)
+system function malloc(size)
+system function arcompare(s1, s2)
 
 dim str = malloc(1)
 dim str2 = malloc(1)

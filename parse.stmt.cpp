@@ -25,7 +25,7 @@ namespace parse {
 		return { "??" }; // should die before here
 	}
 
-	Node stmt_dim() {
+	Node stmt_dim(int local) {
 		if (input.peeklower() != "dim") input.die(); // is dim statement
 		input.next();
 		if (!input.is_identifier()) input.die(); // expect identifier
@@ -64,6 +64,8 @@ namespace parse {
 			if (!input.eol()) input.die(); // end-line
 			input.nextline();
 			return { "dim", name, {
+				{ "type", "int" },
+				{ "scope", local ? "local" : "global" },
 				myexpr
 			}};
 		}

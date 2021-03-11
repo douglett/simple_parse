@@ -37,7 +37,9 @@ namespace parse {
 		Node args = { "arguments" };
 		while (true) {
 			if (!input.is_identifier()) break;
-			args.push({ "dim", input.peek() });
+			args.push({ "dim", input.peek(), {
+				{ "type", "int" }
+			}});
 			input.next();
 			if (input.peek() != ",") break;
 			input.next(); // eat comma
@@ -51,7 +53,6 @@ namespace parse {
 		if (!input.eol()) input.die();
 		input.nextline();
 		return { "function-declaration", name, {
-			// { "name", name },
 			{ "scope", "script (default?)" },
 			args
 		}};
@@ -69,6 +70,7 @@ namespace parse {
 		// copy arguments into local variables
 		int argc = 0;
 		for (auto arg : arguments.kids) {
+			arg.push({ "scope", "local" });
 			arg.push({ "argument", to_string(argc) });
 			locals.push(arg);
 			argc++;
@@ -80,7 +82,7 @@ namespace parse {
 		// parse local variables
 		while (!input.eof())
 			if      (input.eol()) input.nextline(); // skip empty lines
-			else if (input.peeklower() == "dim") locals.push(stmt_dim()); // make dim
+			else if (input.peeklower() == "dim") locals.push(stmt_dim(true)); // make dim
 			else    break; // end of dims
 		check_dup_values(locals, "locals"); // check for duplicate local variables (will also check clones argument names)
 	}

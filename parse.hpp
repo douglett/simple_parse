@@ -8,13 +8,14 @@ namespace parse {
 	
 	int   init();
 	int   script(const std::string& fname);
-	Node  script_get_var(const std::string& name);
+	int   show();
+	Node  script_get_dim(const std::string& name);
 	Node  script_get_decl(const std::string& name);
 	Node  func();
 	Node  func_decl();
 	Node  func_decl_sys();
 	Node  stmt();
-	Node  stmt_dim();
+	Node  stmt_dim(int local);
 	Node  stmt_block();
 	Node  stmt_block_end(const std::string& blocktype);
 	Node  expr();

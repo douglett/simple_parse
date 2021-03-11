@@ -34,7 +34,7 @@ namespace parse {
 		auto name = input.peek();
 		input.next();
 		if    (input.peek() == "[")  return _array_index(name);
-		else  return script_get_var(name);
+		else  return script_get_dim(name);
 	}
 
 
@@ -111,7 +111,7 @@ namespace parse {
 			// a bit of duplication here with expr_assignable above. OK?
 			if      (input.peek() == "(")  return _call(value);
 			else if (input.peek() == "[")  return _array_index(value);
-			else    return script_get_var(value);
+			else    return script_get_dim(value);
 		}
 		else if (input.is_integer())   return input.next(), Node{ "number", value };
 		else if (input.peek() == "(")  return _brackets();
@@ -148,7 +148,7 @@ namespace parse {
 	}
 
 	Node _array_index(const string& name) {
-		auto var = script_get_var(name);
+		auto var = script_get_dim(name);
 		if (input.peek() != "[") input.die(); 
 		input.next();
 		auto addr = expr();
