@@ -47,9 +47,11 @@ namespace parse {
 	Node script_get_dim(const std::string& name) {
 		// return the named variable, with scoping definition
 		for (const auto& l : locals.kids)
-			if (l.value == name) return { "var-local", name };
+			// if (l.value == name) return { "var-local", name };
+			if (l.value == name) return l;
 		for (const auto& g : globals.kids)
-			if (g.value == name) return { "var-global", name };
+			// if (g.value == name) return { "var-global", name };
+			if (g.value == name) return g;
 		input.die("undefined-variable: "+name); // error checking
 		return { "??" };
 	}

@@ -9,6 +9,7 @@ namespace parse {
 	Node _prod();
 	Node _atom();
 	Node _call(const string& name);
+	Node _integer(const string& name);
 	Node _array_index(const string& name);
 	Node _brackets();
 
@@ -34,7 +35,7 @@ namespace parse {
 		auto name = input.peek();
 		input.next();
 		if    (input.peek() == "[")  return _array_index(name);
-		else  return script_get_dim(name);
+		else  return _integer(name);
 	}
 
 
@@ -111,7 +112,7 @@ namespace parse {
 			// a bit of duplication here with expr_assignable above. OK?
 			if      (input.peek() == "(")  return _call(value);
 			else if (input.peek() == "[")  return _array_index(value);
-			else    return script_get_dim(value);
+			else    return _integer(value);
 		}
 		else if (input.is_integer())   return input.next(), Node{ "number", value };
 		else if (input.peek() == "(")  return _brackets();
@@ -147,8 +148,25 @@ namespace parse {
 		}};
 	}
 
+	Node _scoped_get(const string& name) {
+		auto dim = script_get_dim(name);
+		if      (dim.at("scope").value == "global")  return { "var-global", name };
+		else if (dim.at("scope").value == "local")   return { "var-local",  name };
+		else    input.die("unknown scope: " + dim.at("scope").value);
+		return { "??" };
+	}
+
+	Node _integer(const string& name) {
+		auto dim = script_get_dim(name);
+		if (dim.at("type").value != "int")      input.die("expected variable");
+		return _scoped_get(name);
+	}
+
 	Node _array_index(const string& name) {
-		auto var = script_get_dim(name);
+		// auto var = script_get_dim(name);
+		auto var = _integer(name);
+		
+
 		if (input.peek() != "[") input.die(); 
 		input.next();
 		auto addr = expr();

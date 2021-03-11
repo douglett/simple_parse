@@ -7,6 +7,7 @@ dim str2 = malloc(1)
 function main()
 	prints str,  "test1"
 	prints str2, "test1"
+	str[1] = 1
 	print "result: ", arcompare(str, str2)
 end function
 
