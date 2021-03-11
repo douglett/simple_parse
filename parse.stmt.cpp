@@ -28,6 +28,7 @@ namespace parse {
 	Node stmt_dim(int local) {
 		if (input.peeklower() != "dim") input.die(); // is dim statement
 		input.next();
+		const string scope = local ? "local" : "global";
 		if (!input.is_identifier()) input.die(); // expect identifier
 		string name = input.peek(); // save dim name
 		input.next();
@@ -36,24 +37,32 @@ namespace parse {
 		// dim array
 		if (input.peek() == "[") {
 			// deprecated error
-			fprintf(stderr, "warning: arrays deprecated\n"), exit(1);
-			// 
-			// input.next();
-			// Node mydim = { "dim_array", name }; // holds the array definition
-			// // get array size
+			// fprintf(stderr, "warning: arrays deprecated\n"), exit(1);
+			
+			input.next();
+			Node mydim = { "dim_array", name }; // holds the array definition
+			
+			// get array size
 			// auto size_expr = expr_zero(); // default array size of zero
 			// if (input.peek() != "]") size_expr = expr(); // if not empty brackets, get size expression
-			// if (input.peek() != "]") input.die(); // array brackets end
-			// input.next();
+			
+			if (input.peek() != "]") input.die(); // array brackets end
+			input.next();
+			
 			// // get string expression
 			// if (input.peek() == "=") { // optional assignement operation
 			// 	input.next();
 			// 	mydim.push( strexp() ); // create string expression and append
 			// }
-			// // end expression
-			// if (!input.eol()) input.die(); // end-line
-			// input.nextline();
-			// return mydim;
+			
+			// end expression
+			if (!input.eol()) input.die(); // end-line
+			input.nextline();
+			return { "dim", name, {
+				{ "type", "array-int" },
+				{ "scope", scope },
+				{ "length", "", { expr_zero() } }
+			}};
 		}
 
 		// dim single int
@@ -65,7 +74,7 @@ namespace parse {
 			input.nextline();
 			return { "dim", name, {
 				{ "type", "int" },
-				{ "scope", local ? "local" : "global" },
+				{ "scope", scope },
 				myexpr
 			}};
 		}

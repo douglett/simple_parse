@@ -149,6 +149,7 @@ namespace parse {
 	}
 
 	Node _scoped_get(const string& name) {
+		// turn complex dim into simple int retrieve 
 		auto dim = script_get_dim(name);
 		if      (dim.at("scope").value == "global")  return { "var-global", name };
 		else if (dim.at("scope").value == "local")   return { "var-local",  name };
@@ -157,21 +158,25 @@ namespace parse {
 	}
 
 	Node _integer(const string& name) {
+		// only accepts integers
 		auto dim = script_get_dim(name);
 		if (dim.at("type").value != "int")  input.die("expected integer");
 		return _scoped_get(name);
 	}
 
 	Node _array_index(const string& name) {
-		// auto var = script_get_dim(name);
-		auto var = _integer(name);
-		
-
+		// only accepts array-int
+		auto dim = script_get_dim(name);
+		auto type = dim.at("type").value;
+		if (type != "array-int")  input.die("expected array-int ("+type+")");
+		auto var = _scoped_get(name);
+		// get subscript
 		if (input.peek() != "[") input.die(); 
 		input.next();
 		auto addr = expr();
 		if (input.peek() != "]") input.die(); 
 		input.next();
+		// return
 		return { "array-access", "", {
 			{ "target", "", { var } },
 			addr
